@@ -1,0 +1,10 @@
+mutation Login($email: String!, $password: String!) {
+  login(
+    options: { email: $email, password: $password }
+  ) {
+    admin {
+      ...RegularAdmin
+    }
+    errors {field, message}
+  }
+}
