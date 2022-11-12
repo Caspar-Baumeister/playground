@@ -1,0 +1,8 @@
+--server 
+yarn watch
+redis-server
+yarn dev
+
+-- web
+yarn dev
+
