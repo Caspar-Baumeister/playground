@@ -19,6 +19,7 @@ exports.AdminResolver = void 0;
 const Admin_1 = require("../entities/Admin");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
+const constants_1 = require("../constants");
 let EmailAndPassword = class EmailAndPassword {
 };
 __decorate([
@@ -120,6 +121,19 @@ let AdminResolver = class AdminResolver {
         req.session.adminId = admin._id;
         return { admin: admin };
     }
+    logout({ req, res }) {
+        return new Promise(resolve => req.session.destroy(err => {
+            res.clearCookie(constants_1.COOKIE_NAME);
+            if (err) {
+                console.log(err);
+                resolve(false);
+                return;
+            }
+            else {
+                resolve(true);
+            }
+        }));
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => Admin_1.Admin, { nullable: true }),
@@ -144,6 +158,13 @@ __decorate([
     __metadata("design:paramtypes", [EmailAndPassword, Object]),
     __metadata("design:returntype", Promise)
 ], AdminResolver.prototype, "login", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AdminResolver.prototype, "logout", null);
 AdminResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], AdminResolver);

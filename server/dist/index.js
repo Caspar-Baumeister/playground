@@ -25,7 +25,7 @@ const main = async () => {
     const redisClient = (0, redis_1.createClient)({ legacyMode: true });
     redisClient.connect().catch(console.error);
     app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }), (0, express_session_1.default)({
-        name: "qid",
+        name: constants_1.COOKIE_NAME,
         store: new RedisStore({ client: redisClient, disableTouch: true }),
         saveUninitialized: false,
         secret: "iansdfinveqriungan",

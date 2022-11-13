@@ -6,3 +6,45 @@ yarn dev
 -- web
 yarn dev
 
+
+
+Structure:
+
+Backend:
+- typescript
+as the coding language (js + typechecking)
+- mikro-orm
+to define the tables (entities) of the database (and connect to the database trough migrations in PostgreSQL language)
+- type-graphql
+to define the queries, mutations and subscriptions on the database used in the backend graphql
+- express
+creates the server where the backend is running on (and also for the frontend ???)
+- apollo 
+is a client (connecting the program that is running with the server)? that connects graphql with the ui ???
+
+Frontend:
+- typescript react
+to build the code for the frontend via tsx files
+- chackra ui
+libary that provides ui components 
+- next
+components such as router and creates the localhost session???
+- graphql
+the language for defining the queries, mutations and subscriptions and communicating to the frontend graphql
+-graphql code generator
+to generate usable hooks with types and gql objects in typescript from the graphql code
+-urql
+the same as apollo for the frontend
+
+
+Database:
+- pgAdmin
+a dashboard to see the databases active on your local server (Do I needed to use it ???)
+- PostgreSQL
+The database language 
+
+Authentication:
+- redis-server
+for an fast databased on which the usertoken is stored
+- argon2
+to hash passwords
