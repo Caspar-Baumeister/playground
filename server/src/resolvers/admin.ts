@@ -3,7 +3,9 @@ import { Admin } from "../entities/Admin";
 import { MyContext } from "../types";
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import argon2 from "argon2";
-import { COOKIE_NAME } from "../constants";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
+import { sendEmail } from "../utiles/sendEmail";
+import { v4 } from "uuid";
 
 @InputType()
 class EmailAndPassword {
@@ -15,7 +17,7 @@ class EmailAndPassword {
 
 @ObjectType()
 class FieldError {
-    @Field()
+    @Field() 
     field: string
     @Field()
     message: string
@@ -42,6 +44,26 @@ export class AdminResolver {
         return admin
     }
 
+    @Mutation(() => Boolean)
+    async forgotPassword(
+        @Arg('email') email: string, 
+        @Ctx() {em, redis}: MyContext)
+        {
+        const fork = em.fork();
+        const admin = await fork.findOne(Admin, {email: email})
+        if (!admin) {
+            return true;
+            
+        }
+        const token = v4()
+
+        await redis.set(FORGET_PASSWORD_PREFIX + token, admin._id, "EX", 1000*60*60*24*3) // 3 DAYS
+        sendEmail(email, 
+            `<a href= "http://localhost:3000/change-password/${token}"> reset password </a>`)
+        return true;
+        }
+    
+
     @Mutation(() => AdminResponse)
     async register(
     @Arg('options') options: EmailAndPassword, 
@@ -61,7 +83,7 @@ export class AdminResolver {
         }
         const fork = em.fork();
         const hashedPassword = await argon2.hash(options.password);
-       const admin = fork.create(Admin,{email: options.email, password: hashedPassword})
+        const admin = fork.create(Admin,{email: options.email, password: hashedPassword})
         try {
             await fork.persistAndFlush(admin)
             

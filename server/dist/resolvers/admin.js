@@ -20,6 +20,8 @@ const Admin_1 = require("../entities/Admin");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const constants_1 = require("../constants");
+const sendEmail_1 = require("../utiles/sendEmail");
+const uuid_1 = require("uuid");
 let EmailAndPassword = class EmailAndPassword {
 };
 __decorate([
@@ -67,6 +69,17 @@ let AdminResolver = class AdminResolver {
         const fork = em.fork();
         const admin = await fork.findOne(Admin_1.Admin, { _id: req.session.adminId });
         return admin;
+    }
+    async forgotPassword(email, { em, redis }) {
+        const fork = em.fork();
+        const admin = await fork.findOne(Admin_1.Admin, { email: email });
+        if (!admin) {
+            return true;
+        }
+        const token = (0, uuid_1.v4)();
+        await redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, admin._id, "EX", 1000 * 60 * 60 * 24 * 3);
+        (0, sendEmail_1.sendEmail)(email, `<a href= "http://localhost:3000/change-password/${token}"> reset password </a>`);
+        return true;
     }
     async register(options, { em, req }) {
         if (options.email.length <= 2) {
@@ -142,6 +155,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AdminResolver.prototype, "me", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)('email')),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminResolver.prototype, "forgotPassword", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => AdminResponse),
     __param(0, (0, type_graphql_1.Arg)('options')),

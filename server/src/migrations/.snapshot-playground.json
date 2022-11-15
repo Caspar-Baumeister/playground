@@ -120,11 +120,11 @@
           "mappedType": "text"
         }
       },
-      "name": "post",
+      "name": "product",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "post_pkey",
+          "keyName": "product_pkey",
           "columnNames": [
             "_id"
           ],

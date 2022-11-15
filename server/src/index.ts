@@ -7,38 +7,43 @@ import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import {buildSchema} from 'type-graphql'
 import { HelloResolver } from './resolvers/hello';
-import { PostResolver } from './resolvers/post';
+import { ProductResolver } from './resolvers/product';
 import { AdminResolver } from './resolvers/admin';
 import session from "express-session";
 import connectRedis from "connect-redis";
-import { createClient } from "redis";
+import Redis from "ioredis";
 import { MyContext } from './types';
 import cors from "cors";
 
 
 
-
+// Main function is translated to js trough yarn watch and then run with yarn dev
 const main = async () => {
+    
+    
+
+    // MikroOrm creates the connection to the PostgreSql database
     const orm = await MikroORM.init(
         mikroOrmConfig
     );
    
+    // update to the latest version of migrations to the Orm entity
     orm.getMigrator().up(); 
-    // const emFork = orm.em.fork();
 
+    // Express creates the server
     const app = express();
 
+    // Redis stores the cooky
     const RedisStore = connectRedis(session);
+    const redis = new Redis();
+    // redis.connect().catch(console.error) 
 
-    const redisClient = createClient({ legacyMode: true })
-    redisClient.connect().catch(console.error)
-
-
+    // Connect Redis to the server and define in which Browser the server runs
     app.use(
     cors({origin: "http://localhost:3000", credentials:true}),
     session({
         name: COOKIE_NAME,
-        store: new RedisStore({ client: redisClient as any, disableTouch: true }),
+        store: new RedisStore({ client: redis as any, disableTouch: true }),
         saveUninitialized: false,
         secret: "iansdfinveqriungan",
         resave: false,
@@ -51,22 +56,25 @@ const main = async () => {
         
     }));
 
+    // Init Appolo with the Type-Graphql schemas and the Context
     const appoloServer = new ApolloServer({
         schema: await buildSchema({resolvers: 
             [   HelloResolver, 
-                PostResolver,
+                ProductResolver,
                 AdminResolver
             ], 
         validate: false,
        
 
     },),
-    context: ({req, res}): MyContext => ({em: orm.em, req, res})
+    context: ({req, res}): MyContext => ({em: orm.em, req, res, redis})
 
     });
 
+    // Connect the appolo server to the Espress app
     appoloServer.applyMiddleware({app, cors: false}); 
 
+    // Run the server on Port 4000
     app.listen(4000, () => {
         console.log('server started on port 4000');
     });

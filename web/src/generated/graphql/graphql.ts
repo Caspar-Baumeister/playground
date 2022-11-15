@@ -132,7 +132,7 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me?: (
-    { __typename?: 'Admin' }
+    { __typename?: 'Admin', email?: string }
     & { ' $fragmentRefs'?: { 'RegularAdminFragment': RegularAdminFragment } }
   ) | null };
 

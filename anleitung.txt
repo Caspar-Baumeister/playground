@@ -6,6 +6,10 @@ yarn dev
 -- web
 yarn dev
 
+-- database
+after adding entities to our database, run:
+yarn create:migration
+
 
 
 Structure:
