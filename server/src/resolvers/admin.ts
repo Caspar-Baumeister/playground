@@ -6,6 +6,8 @@ import argon2 from "argon2";
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
 import { sendEmail } from "../utiles/sendEmail";
 import { v4 } from "uuid";
+import { dataSource } from "..";
+
 
 @InputType()
 class EmailAndPassword {
@@ -35,22 +37,67 @@ class AdminResponse {
 export class AdminResolver {
 
     @Query(() => Admin, {nullable:true})
-    async me(@Ctx() {req, em}: MyContext) {
+    async me(@Ctx() {req}: MyContext) {
         if(!req.session.adminId) {
             return null
         }
-        const fork = em.fork();
-        const admin = await fork.findOne(Admin, {_id: req.session.adminId})
-        return admin
+        return await Admin.findOneBy({_id: req.session.adminId})
+     
     }
+
+    @Mutation(() => AdminResponse)
+    async changePassword(
+        @Arg('token') token: string, 
+        @Arg('newPassword') newPassword: string, 
+        @Ctx() {redis, req}: MyContext)
+        {
+    
+        if (newPassword.length < 2) {
+            return {errors: [
+                {
+                    field: "newPassword",
+                    message: "lenght must be greater then 2"
+                }
+            ]}
+        }
+
+        const key = FORGET_PASSWORD_PREFIX+token
+
+        const adminId = await redis.get(key)
+
+        if (!adminId) {
+          return { errors: [{
+                field: "token",
+                message: "token expired"
+
+            }]}
+        }
+        
+       const _id = parseInt(adminId);
+        const admin = await Admin.findOneBy({_id})
+
+        if (!admin) {
+            return { errors: [{
+                field: "token",
+                message: "user no longer exist"
+
+            }]}
+        }
+
+        await Admin.update({_id}, {password:await argon2.hash(newPassword)})
+
+        req.session.adminId = parseInt(adminId);
+        await redis.del(key)
+
+        return {admin:admin}
+        }
 
     @Mutation(() => Boolean)
     async forgotPassword(
         @Arg('email') email: string, 
-        @Ctx() {em, redis}: MyContext)
+        @Ctx() {redis}: MyContext)
         {
-        const fork = em.fork();
-        const admin = await fork.findOne(Admin, {email: email})
+        const admin = await Admin.findOneBy({email})
         if (!admin) {
             return true;
             
@@ -67,7 +114,7 @@ export class AdminResolver {
     @Mutation(() => AdminResponse)
     async register(
     @Arg('options') options: EmailAndPassword, 
-    @Ctx() {em, req}: MyContext): Promise<AdminResponse>
+    @Ctx() {req}: MyContext): Promise<AdminResponse>
      {
         if (options.email.length <= 2) {
             return {errors: [{
@@ -81,13 +128,21 @@ export class AdminResolver {
                 message: "invalid password"
             }]}
         }
-        const fork = em.fork();
         const hashedPassword = await argon2.hash(options.password);
-        const admin = fork.create(Admin,{email: options.email, password: hashedPassword})
+        let admin;
         try {
-            await fork.persistAndFlush(admin)
-            
+           const result = await dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(Admin)
+                .values([
+                    {email: options.email, password: hashedPassword },    
+                ]).returning("*")
+                .execute()
+            console.log("result", result);
+            admin = result.raw
         } catch (error) {
+            console.log("ERR", error)
             if(error.code === "23505" || error.detail.includes["already exists"]){
                 return {errors: [{
                     field: "email",
@@ -107,10 +162,9 @@ export class AdminResolver {
     @Mutation(() => AdminResponse)
     async login(
     @Arg('options') options: EmailAndPassword, 
-    @Ctx() {em, req}: MyContext): Promise<AdminResponse>
+    @Ctx() {req}: MyContext): Promise<AdminResponse>
      {
-        const fork = em.fork();
-        const admin = await fork.findOne(Admin, {email: options.email})
+        const admin = await Admin.findOneBy({email: options.email})
         if (!admin) {
             return {errors: [{
                 field: "email",

@@ -44,22 +44,35 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createPost: Post;
-  deletePost: Scalars['Boolean'];
+  changePassword: AdminResponse;
+  createProduct: Product;
+  deleteProduct: Scalars['Boolean'];
+  forgotPassword: Scalars['Boolean'];
   login: AdminResponse;
   logout: Scalars['Boolean'];
   register: AdminResponse;
-  updatePost?: Maybe<Post>;
+  updateProduct?: Maybe<Product>;
 };
 
 
-export type MutationCreatePostArgs = {
+export type MutationChangePasswordArgs = {
+  newPassword: Scalars['String'];
+  token: Scalars['String'];
+};
+
+
+export type MutationCreateProductArgs = {
   title: Scalars['String'];
 };
 
 
-export type MutationDeletePostArgs = {
+export type MutationDeleteProductArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String'];
 };
 
 
@@ -73,13 +86,13 @@ export type MutationRegisterArgs = {
 };
 
 
-export type MutationUpdatePostArgs = {
+export type MutationUpdateProductArgs = {
   id: Scalars['Float'];
   title?: InputMaybe<Scalars['String']>;
 };
 
-export type Post = {
-  __typename?: 'Post';
+export type Product = {
+  __typename?: 'Product';
   _id: Scalars['Float'];
   createdAt: Scalars['String'];
   title: Scalars['String'];
@@ -90,16 +103,34 @@ export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
   me?: Maybe<Admin>;
-  post?: Maybe<Post>;
-  posts: Array<Post>;
+  product?: Maybe<Product>;
+  products: Array<Product>;
 };
 
 
-export type QueryPostArgs = {
+export type QueryProductArgs = {
   id: Scalars['Int'];
 };
 
 export type RegularAdminFragment = { __typename?: 'Admin', _id: number, email: string, createdAt: string, updatedAt: string } & { ' $fragmentName'?: 'RegularAdminFragment' };
+
+export type ChangePasswordMutationVariables = Exact<{
+  token: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'AdminResponse', admin?: (
+      { __typename?: 'Admin' }
+      & { ' $fragmentRefs'?: { 'RegularAdminFragment': RegularAdminFragment } }
+    ) | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
+
+export type ForgotPasswordMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: boolean };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
@@ -132,7 +163,7 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me?: (
-    { __typename?: 'Admin', email?: string }
+    { __typename?: 'Admin' }
     & { ' $fragmentRefs'?: { 'RegularAdminFragment': RegularAdminFragment } }
   ) | null };
 
@@ -144,6 +175,32 @@ export const RegularAdminFragmentDoc = gql`
   updatedAt
 }
     `;
+export const ChangePasswordDocument = gql`
+    mutation changePassword($token: String!, $newPassword: String!) {
+  changePassword(token: $token, newPassword: $newPassword) {
+    admin {
+      ...RegularAdmin
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    ${RegularAdminFragmentDoc}`;
+
+export function useChangePasswordMutation() {
+  return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const ForgotPasswordDocument = gql`
+    mutation forgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}
+    `;
+
+export function useForgotPasswordMutation() {
+  return Urql.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument);
+};
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(options: {email: $email, password: $password}) {

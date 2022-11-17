@@ -1,7 +1,4 @@
-import {MikroORM} from '@mikro-orm/core';
 import { COOKIE_NAME, __prod__ } from './constants';
-
-import mikroOrmConfig from './mikro-orm.config';
 import express from "express";
 import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
@@ -14,21 +11,38 @@ import connectRedis from "connect-redis";
 import Redis from "ioredis";
 import { MyContext } from './types';
 import cors from "cors";
+import {DataSource} from 'typeorm'
+import { Product } from './entities/Product';
+import { Admin } from './entities/Admin';
 
 
+export const dataSource = new DataSource({
+    type: "postgres",
+    database: "playground",
+    username: "postgres",
+    password: "C4sp4R123",
+    logging: true,
+    synchronize: true,
+    entities: [Product, Admin]
+    
+})
 
 // Main function is translated to js trough yarn watch and then run with yarn dev
 const main = async () => {
+
+    //typeorm creates the connection to the PostgreSql database
     
+    // load entities, establish db connection, sync schema, etc.
+    await dataSource.initialize()
     
 
-    // MikroOrm creates the connection to the PostgreSql database
-    const orm = await MikroORM.init(
-        mikroOrmConfig
-    );
+    // // MikroOrm 
+    // const orm = await MikroORM.init(
+    //     mikroOrmConfig
+    // );
    
-    // update to the latest version of migrations to the Orm entity
-    orm.getMigrator().up(); 
+    // // update to the latest version of migrations to the Orm entity
+    // orm.getMigrator().up(); 
 
     // Express creates the server
     const app = express();
@@ -67,7 +81,7 @@ const main = async () => {
        
 
     },),
-    context: ({req, res}): MyContext => ({em: orm.em, req, res, redis})
+    context: ({req, res}): MyContext => ({req, res, redis})
 
     });
 

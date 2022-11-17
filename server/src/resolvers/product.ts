@@ -1,67 +1,56 @@
 
 import { Product } from "../entities/Product";
-import { MyContext } from "../types";
-import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
 
 
 @Resolver()
 export class ProductResolver {
     @Query(() => [Product])
     products(
-        @Ctx() {em}: MyContext
     ): Promise<Product[]> {
-        const fork = em.fork();
-        return fork.find(Product, {})
+        return Product.find()
     }
 
     @Query(() => Product, {nullable: true})
     product(
-       @Arg('id',  () => Int) id: number,
-        @Ctx() {em}: MyContext
+       @Arg('id') _id: number,
     ): Promise<Product| null> {
-        const fork = em.fork();
-        return fork.findOne(Product, {_id:id })
+        return Product.findOneBy({_id})
     }
 
     @Mutation(() => Product)
    async createProduct(
         @Arg('title') title: string,
-        @Ctx() {em}: MyContext
     ): Promise<Product> {
-        const fork = em.fork();
-        const product = fork.create(Product, {title});
-        await fork.persistAndFlush(Product);
-        return product
+      
+        return Product.create({title}).save()
     }
 
     @Mutation(() => Product,  {nullable: true})
     async updateProduct(
-        @Arg('id') id: number,
+        @Arg('id') _id: number,
         @Arg('title', () => String, {nullable: true}) title: string,
-        @Ctx() {em}: MyContext
      ): Promise<Product | null> {
-         const fork = em.fork();
-         const product = await fork.findOne(Product, {_id:id })
+         const product = await Product.findOneBy({_id})
         if (!product) {
             return null;
         }
         if (typeof title !== undefined) {
-            product.title = title;
-            await fork.persistAndFlush(product);
+            Product.update({_id} ,{title});
         }
          return product
      }
 
      @Mutation(() => Boolean)
     async deleteProduct(
-        @Arg('id',  () => Int) id: number,
-         @Ctx() {em}: MyContext
+        @Arg('id') _id: number,
+        
      ): Promise<boolean> {
         
-         const fork = em.fork();
+         
          
          try {
-            fork.nativeDelete(Product, {_id: id})
+            Product.delete({_id})
             
          } catch (error) {
             return false;

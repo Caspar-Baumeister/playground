@@ -22,6 +22,7 @@ const argon2_1 = __importDefault(require("argon2"));
 const constants_1 = require("../constants");
 const sendEmail_1 = require("../utiles/sendEmail");
 const uuid_1 = require("uuid");
+const __1 = require("..");
 let EmailAndPassword = class EmailAndPassword {
 };
 __decorate([
@@ -62,17 +63,44 @@ AdminResponse = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], AdminResponse);
 let AdminResolver = class AdminResolver {
-    async me({ req, em }) {
+    async me({ req }) {
         if (!req.session.adminId) {
             return null;
         }
-        const fork = em.fork();
-        const admin = await fork.findOne(Admin_1.Admin, { _id: req.session.adminId });
-        return admin;
+        return await Admin_1.Admin.findOneBy({ _id: req.session.adminId });
     }
-    async forgotPassword(email, { em, redis }) {
-        const fork = em.fork();
-        const admin = await fork.findOne(Admin_1.Admin, { email: email });
+    async changePassword(token, newPassword, { redis, req }) {
+        if (newPassword.length < 2) {
+            return { errors: [
+                    {
+                        field: "newPassword",
+                        message: "lenght must be greater then 2"
+                    }
+                ] };
+        }
+        const key = constants_1.FORGET_PASSWORD_PREFIX + token;
+        const adminId = await redis.get(key);
+        if (!adminId) {
+            return { errors: [{
+                        field: "token",
+                        message: "token expired"
+                    }] };
+        }
+        const _id = parseInt(adminId);
+        const admin = await Admin_1.Admin.findOneBy({ _id });
+        if (!admin) {
+            return { errors: [{
+                        field: "token",
+                        message: "user no longer exist"
+                    }] };
+        }
+        await Admin_1.Admin.update({ _id }, { password: await argon2_1.default.hash(newPassword) });
+        req.session.adminId = parseInt(adminId);
+        await redis.del(key);
+        return { admin: admin };
+    }
+    async forgotPassword(email, { redis }) {
+        const admin = await Admin_1.Admin.findOneBy({ email });
         if (!admin) {
             return true;
         }
@@ -81,7 +109,7 @@ let AdminResolver = class AdminResolver {
         (0, sendEmail_1.sendEmail)(email, `<a href= "http://localhost:3000/change-password/${token}"> reset password </a>`);
         return true;
     }
-    async register(options, { em, req }) {
+    async register(options, { req }) {
         if (options.email.length <= 2) {
             return { errors: [{
                         field: "email",
@@ -94,13 +122,22 @@ let AdminResolver = class AdminResolver {
                         message: "invalid password"
                     }] };
         }
-        const fork = em.fork();
         const hashedPassword = await argon2_1.default.hash(options.password);
-        const admin = fork.create(Admin_1.Admin, { email: options.email, password: hashedPassword });
+        let admin;
         try {
-            await fork.persistAndFlush(admin);
+            const result = await __1.dataSource
+                .createQueryBuilder()
+                .insert()
+                .into(Admin_1.Admin)
+                .values([
+                { email: options.email, password: hashedPassword },
+            ]).returning("*")
+                .execute();
+            console.log("result", result);
+            admin = result.raw;
         }
         catch (error) {
+            console.log("ERR", error);
             if (error.code === "23505" || error.detail.includes["already exists"]) {
                 return { errors: [{
                             field: "email",
@@ -115,9 +152,8 @@ let AdminResolver = class AdminResolver {
         req.session.adminId = admin._id;
         return { admin: admin };
     }
-    async login(options, { em, req }) {
-        const fork = em.fork();
-        const admin = await fork.findOne(Admin_1.Admin, { email: options.email });
+    async login(options, { req }) {
+        const admin = await Admin_1.Admin.findOneBy({ email: options.email });
         if (!admin) {
             return { errors: [{
                         field: "email",
@@ -155,6 +191,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AdminResolver.prototype, "me", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => AdminResponse),
+    __param(0, (0, type_graphql_1.Arg)('token')),
+    __param(1, (0, type_graphql_1.Arg)('newPassword')),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminResolver.prototype, "changePassword", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)('email')),

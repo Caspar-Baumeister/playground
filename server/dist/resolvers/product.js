@@ -16,36 +16,28 @@ exports.ProductResolver = void 0;
 const Product_1 = require("../entities/Product");
 const type_graphql_1 = require("type-graphql");
 let ProductResolver = class ProductResolver {
-    products({ em }) {
-        const fork = em.fork();
-        return fork.find(Product_1.Product, {});
+    products() {
+        return Product_1.Product.find();
     }
-    product(id, { em }) {
-        const fork = em.fork();
-        return fork.findOne(Product_1.Product, { _id: id });
+    product(_id) {
+        return Product_1.Product.findOneBy({ _id });
     }
-    async createProduct(title, { em }) {
-        const fork = em.fork();
-        const product = fork.create(Product_1.Product, { title });
-        await fork.persistAndFlush(Product_1.Product);
-        return product;
+    async createProduct(title) {
+        return Product_1.Product.create({ title }).save();
     }
-    async updateProduct(id, title, { em }) {
-        const fork = em.fork();
-        const product = await fork.findOne(Product_1.Product, { _id: id });
+    async updateProduct(_id, title) {
+        const product = await Product_1.Product.findOneBy({ _id });
         if (!product) {
             return null;
         }
         if (typeof title !== undefined) {
-            product.title = title;
-            await fork.persistAndFlush(product);
+            Product_1.Product.update({ _id }, { title });
         }
         return product;
     }
-    async deleteProduct(id, { em }) {
-        const fork = em.fork();
+    async deleteProduct(_id) {
         try {
-            fork.nativeDelete(Product_1.Product, { _id: id });
+            Product_1.Product.delete({ _id });
         }
         catch (error) {
             return false;
@@ -55,42 +47,37 @@ let ProductResolver = class ProductResolver {
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [Product_1.Product]),
-    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "products", null);
 __decorate([
     (0, type_graphql_1.Query)(() => Product_1.Product, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('id', () => type_graphql_1.Int)),
-    __param(1, (0, type_graphql_1.Ctx)()),
+    __param(0, (0, type_graphql_1.Arg)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "product", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Product_1.Product),
     __param(0, (0, type_graphql_1.Arg)('title')),
-    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "createProduct", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Product_1.Product, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)('id')),
     __param(1, (0, type_graphql_1.Arg)('title', () => String, { nullable: true })),
-    __param(2, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "updateProduct", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)('id', () => type_graphql_1.Int)),
-    __param(1, (0, type_graphql_1.Ctx)()),
+    __param(0, (0, type_graphql_1.Arg)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "deleteProduct", null);
 ProductResolver = __decorate([

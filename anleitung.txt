@@ -17,7 +17,7 @@ Structure:
 Backend:
 - typescript
 as the coding language (js + typechecking)
-- mikro-orm
+- typeorm
 to define the tables (entities) of the database (and connect to the database trough migrations in PostgreSQL language)
 - type-graphql
 to define the queries, mutations and subscriptions on the database used in the backend graphql
@@ -43,12 +43,12 @@ the same as apollo for the frontend
 
 Database:
 - pgAdmin
-a dashboard to see the databases active on your local server (Do I needed to use it ???)
+create the database (or delete) and a dashboard to see the databases active on your local server
 - PostgreSQL
 The database language 
 
 Authentication:
-- redis-server
-for an fast databased on which the usertoken is stored
+- ioredis
+for a fast databased on which the usertoken and change password token are stored
 - argon2
 to hash passwords

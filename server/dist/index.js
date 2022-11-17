@@ -3,9 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@mikro-orm/core");
+exports.dataSource = void 0;
 const constants_1 = require("./constants");
-const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const express_1 = __importDefault(require("express"));
 require("reflect-metadata");
 const apollo_server_express_1 = require("apollo-server-express");
@@ -17,9 +16,20 @@ const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const ioredis_1 = __importDefault(require("ioredis"));
 const cors_1 = __importDefault(require("cors"));
+const typeorm_1 = require("typeorm");
+const Product_1 = require("./entities/Product");
+const Admin_1 = require("./entities/Admin");
+exports.dataSource = new typeorm_1.DataSource({
+    type: "postgres",
+    database: "playground",
+    username: "postgres",
+    password: "C4sp4R123",
+    logging: true,
+    synchronize: true,
+    entities: [Product_1.Product, Admin_1.Admin]
+});
 const main = async () => {
-    const orm = await core_1.MikroORM.init(mikro_orm_config_1.default);
-    orm.getMigrator().up();
+    await exports.dataSource.initialize();
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
     const redis = new ioredis_1.default();
@@ -43,7 +53,7 @@ const main = async () => {
             ],
             validate: false,
         }),
-        context: ({ req, res }) => ({ em: orm.em, req, res, redis })
+        context: ({ req, res }) => ({ req, res, redis })
     });
     appoloServer.applyMiddleware({ app, cors: false });
     app.listen(4000, () => {
