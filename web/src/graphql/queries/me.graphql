@@ -1,5 +1,10 @@
 query Me {
     me {
-       ...RegularAdmin
+     
+        _id
+        email
+        createdAt
+        updatedAt
+        
     }
 }

@@ -5,7 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import {buildSchema} from 'type-graphql'
 import { HelloResolver } from './resolvers/hello';
 import { ProductResolver } from './resolvers/product';
-import { AdminResolver } from './resolvers/admin';
+import { UserResolver } from './resolvers/user';
 import session from "express-session";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
@@ -13,7 +13,7 @@ import { MyContext } from './types';
 import cors from "cors";
 import {DataSource} from 'typeorm'
 import { Product } from './entities/Product';
-import { Admin } from './entities/Admin';
+import { User } from './entities/User';
 
 
 export const dataSource = new DataSource({
@@ -23,7 +23,7 @@ export const dataSource = new DataSource({
     password: "C4sp4R123",
     logging: true,
     synchronize: true,
-    entities: [Product, Admin]
+    entities: [Product, User]
     
 })
 
@@ -75,7 +75,7 @@ const main = async () => {
         schema: await buildSchema({resolvers: 
             [   HelloResolver, 
                 ProductResolver,
-                AdminResolver
+                UserResolver
             ], 
         validate: false,
        

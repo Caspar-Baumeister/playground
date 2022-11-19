@@ -4,7 +4,7 @@ import Redis from "ioredis";
 
 export type MyContext = {
     // em: EntityManager<IDatabaseDriver<Connection>>;
-    req: Request & {session: Session & {adminId?: number}},
+    req: Request & {session: Session & {userId?: number}},
     res: Response
     redis: Redis
 }

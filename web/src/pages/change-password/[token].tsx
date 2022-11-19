@@ -27,14 +27,13 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
             token,
             newPassword: values.newPassword,
           })) as OperationResult<ChangePasswordMutation>;
-          console.log(response);
           if (response.data?.changePassword.errors) {
             const errorMap = toErrorMap(response.data.changePassword.errors);
             if ("token" in errorMap) {
               setTokenError(errorMap.token);
             }
             setErrors(errorMap);
-          } else if (response.data?.changePassword.admin) {
+          } else if (response.data?.changePassword.user) {
             router.push("/");
           }
           return response;

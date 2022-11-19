@@ -28,11 +28,10 @@ const Login: React.FC<{}> = ({}) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values: EmailAndPassword, { setErrors }) => {
-          console.log(values);
           const response = await login(values);
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
-          } else if (response.data?.login.admin) {
+          } else if (response.data?.login.user) {
             router.push("/");
           }
           return response;

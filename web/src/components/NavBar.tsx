@@ -43,7 +43,6 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
 
         <Button
           onClick={() => {
-            console.log("logout clicked");
             logout({});
           }}
           isLoading={logoutFetching}

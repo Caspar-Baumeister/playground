@@ -2,8 +2,11 @@ mutation Login($email: String!, $password: String!) {
   login(
     options: { email: $email, password: $password }
   ) {
-    admin {
-      ...RegularAdmin
+    user {
+      _id
+      email
+      createdAt
+      updatedAt
     }
     errors {field, message}
   }

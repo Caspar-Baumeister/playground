@@ -1,6 +1,0 @@
-fragment RegularAdmin on Admin {
-    _id
-    email
-    createdAt
-    updatedAt
-}

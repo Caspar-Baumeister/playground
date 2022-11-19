@@ -11,14 +11,14 @@ const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
 const hello_1 = require("./resolvers/hello");
 const product_1 = require("./resolvers/product");
-const admin_1 = require("./resolvers/admin");
+const user_1 = require("./resolvers/user");
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const ioredis_1 = __importDefault(require("ioredis"));
 const cors_1 = __importDefault(require("cors"));
 const typeorm_1 = require("typeorm");
 const Product_1 = require("./entities/Product");
-const Admin_1 = require("./entities/Admin");
+const User_1 = require("./entities/User");
 exports.dataSource = new typeorm_1.DataSource({
     type: "postgres",
     database: "playground",
@@ -26,7 +26,7 @@ exports.dataSource = new typeorm_1.DataSource({
     password: "C4sp4R123",
     logging: true,
     synchronize: true,
-    entities: [Product_1.Product, Admin_1.Admin]
+    entities: [Product_1.Product, User_1.User]
 });
 const main = async () => {
     await exports.dataSource.initialize();
@@ -49,7 +49,7 @@ const main = async () => {
     const appoloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({ resolvers: [hello_1.HelloResolver,
                 product_1.ProductResolver,
-                admin_1.AdminResolver
+                user_1.UserResolver
             ],
             validate: false,
         }),

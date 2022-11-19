@@ -24,11 +24,11 @@ const Register: React.FC<registerProps> = ({}) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values: FormValues, { setErrors }) => {
-          console.log(values);
           const response = await register(values);
+
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
-          } else if (response.data?.register.admin) {
+          } else if (response.data?.register.user) {
             router.push("/");
           }
           return response;

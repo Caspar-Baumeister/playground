@@ -21,7 +21,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
                   if (result.login.errors) {
                     return query;
                   } else {
-                    return { me: result.login.admin };
+                    return { me: result.login.user };
                   }
                 }
               );
@@ -45,7 +45,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
                   if (result.register.errors) {
                     return query;
                   } else {
-                    return { me: result.register.admin };
+                    return { me: result.register.user };
                   }
                 }
               );

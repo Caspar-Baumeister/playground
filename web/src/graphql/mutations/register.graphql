@@ -2,13 +2,13 @@ mutation Register($email: String!, $password: String!) {
   register(
     options: { email: $email, password: $password }
   ) {
-    errors {
-      field
-      message
+    user {
+      _id
+      email
+      createdAt
+      updatedAt
     }
-    admin {
-      ...RegularAdmin
-    }
+    errors {field, message}
   }
 }
 
