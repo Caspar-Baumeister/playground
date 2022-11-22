@@ -12,12 +12,13 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 interface registerProps {}
 interface FormValues {
   email: string;
+  name: string;
   password: string;
 }
 
 const Register: React.FC<registerProps> = ({}) => {
   const router = useRouter();
-  const initialValues: FormValues = { email: "", password: "" };
+  const initialValues: FormValues = { email: "", name: "", password: "" };
   const [, register] = useRegisterMutation();
   return (
     <Wrapper variant="small">
@@ -37,6 +38,9 @@ const Register: React.FC<registerProps> = ({}) => {
         {(props) => (
           <Form>
             <InputField name="email" label="Email" />
+            <Box mt={4}>
+              <InputField name="name" label="Name" />
+            </Box>
             <Box mt={4}>
               <InputField name="password" label="Password" type="password" />
             </Box>

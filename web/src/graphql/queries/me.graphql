@@ -1,10 +1,9 @@
 query Me {
-    me {
-     
+    me {    
         _id
+        name
         email
         createdAt
-        updatedAt
-        
+        updatedAt  
     }
 }

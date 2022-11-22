@@ -37,8 +37,8 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   else {
     body = (
       <Flex>
-        <Box color="white" mr={2}>
-          {data!.me!.email}
+        <Box color="white" mr={6}>
+          {data!.me!.name}
         </Box>
 
         <Button

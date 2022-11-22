@@ -1,0 +1,9 @@
+query Shops($limit: Int!){
+  shops(limit: $limit) {
+    _id
+    name
+    creatorId
+    createdAt
+    updatedAt
+  }
+}
