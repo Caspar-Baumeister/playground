@@ -10,9 +10,11 @@
     "@chakra-ui/icons": "^2.0.2",
     "@chakra-ui/react": "^2.2.1",
     "@chakra-ui/theme-tools": "^2.0.2",
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.9.0",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "@graphql-codegen/client-preset": "^1.1.3",
+    "@mui/icons-material": "^5.10.15",
+    "@mui/material": "^5.10.15",
     "@urql/exchange-graphcache": "^5.0.5",
     "formik": "^2.2.9",
     "framer-motion": "^6.3.0",
@@ -22,6 +24,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
+    "recharts": "^2.1.16",
     "urql": "^3.0.3"
   },
   "devDependencies": {

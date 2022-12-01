@@ -38,7 +38,7 @@ the language for defining the queries, mutations and subscriptions and communica
 -graphql code generator
 to generate usable hooks with types and gql objects in typescript from the graphql code
 -urql
-the same as apollo for the frontend
+the same as apollo for the frontend, caching
 
 
 Database:

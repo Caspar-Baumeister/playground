@@ -35,6 +35,23 @@ __decorate([
 EmailAndPassword = __decorate([
     (0, type_graphql_1.InputType)()
 ], EmailAndPassword);
+let NameEmailAndPassword = class NameEmailAndPassword {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NameEmailAndPassword.prototype, "name", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NameEmailAndPassword.prototype, "email", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NameEmailAndPassword.prototype, "password", void 0);
+NameEmailAndPassword = __decorate([
+    (0, type_graphql_1.InputType)()
+], NameEmailAndPassword);
 let FieldError = class FieldError {
 };
 __decorate([
@@ -109,6 +126,12 @@ let UserResolver = class UserResolver {
         return true;
     }
     async register(options, { req }) {
+        if (options.name.length <= 2) {
+            return { errors: [{
+                        field: "name",
+                        message: "invalid name"
+                    }] };
+        }
         if (options.email.length <= 2) {
             return { errors: [{
                         field: "email",
@@ -124,7 +147,7 @@ let UserResolver = class UserResolver {
         const hashedPassword = await argon2_1.default.hash(options.password);
         let user;
         try {
-            user = await User_1.User.create({ email: options.email, password: hashedPassword }).save();
+            user = await User_1.User.create({ email: options.email, password: hashedPassword, name: options.name }).save();
         }
         catch (error) {
             console.log("ERR", error);
@@ -203,7 +226,7 @@ __decorate([
     __param(0, (0, type_graphql_1.Arg)('options')),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [EmailAndPassword, Object]),
+    __metadata("design:paramtypes", [NameEmailAndPassword, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([

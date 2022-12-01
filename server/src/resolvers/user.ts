@@ -16,6 +16,16 @@ class EmailAndPassword {
     password: string
 }
 
+@InputType()
+class NameEmailAndPassword {
+    @Field()
+    name: string
+    @Field()
+    email: string
+    @Field()
+    password: string
+}
+
 @ObjectType()
 class FieldError {
     @Field() 
@@ -112,9 +122,15 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async register(
-    @Arg('options') options: EmailAndPassword, 
+    @Arg('options') options: NameEmailAndPassword, 
     @Ctx() {req}: MyContext): Promise<UserResponse>
      {
+        if (options.name.length <= 2) {
+            return {errors: [{
+                field: "name",
+                message: "invalid name"
+            }]}
+        }
         if (options.email.length <= 2) {
             return {errors: [{
                 field: "email",
@@ -130,7 +146,7 @@ export class UserResolver {
         const hashedPassword = await argon2.hash(options.password);
         let user;
         try {
-            user = await User.create({email: options.email, password: hashedPassword}).save()
+            user = await User.create({email: options.email, password: hashedPassword, name: options.name}).save()
         
         // This is how you could create and save an user with a querybuilder
         //    const result = await dataSource

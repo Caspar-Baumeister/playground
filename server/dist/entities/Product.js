@@ -12,7 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Product = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const User_1 = require("./User");
+const Category_1 = require("./Category");
+const Shop_1 = require("./Shop");
+const WarehouseProduct_1 = require("./WarehouseProduct");
 let Product = class Product extends typeorm_1.BaseEntity {
     constructor() {
         super(...arguments);
@@ -28,16 +30,29 @@ __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Product.prototype, "title", void 0);
+], Product.prototype, "name", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Product.prototype, "creatorId", void 0);
+], Product.prototype, "usualPrice", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.products),
-    __metadata("design:type", User_1.User)
-], Product.prototype, "creator", void 0);
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Product.prototype, "shopId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.products),
+    __metadata("design:type", Shop_1.Shop)
+], Product.prototype, "shop", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => Category_1.Category, (category) => category.products),
+    __metadata("design:type", Category_1.Category)
+], Product.prototype, "category", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => WarehouseProduct_1.WarehouseProduct, (warehouseProduct) => warehouseProduct.product),
+    __metadata("design:type", Array)
+], Product.prototype, "warehouseProducts", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)(),

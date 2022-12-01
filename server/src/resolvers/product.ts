@@ -20,23 +20,23 @@ export class ProductResolver {
 
     @Mutation(() => Product)
    async createProduct(
-        @Arg('title') title: string,
+        @Arg('name') name: string,
     ): Promise<Product> {
       
-        return Product.create({title}).save()
+        return Product.create({name}).save()
     }
 
     @Mutation(() => Product,  {nullable: true})
     async updateProduct(
         @Arg('id') _id: number,
-        @Arg('title', () => String, {nullable: true}) title: string,
+        @Arg('name', () => String, {nullable: true}) name: string,
      ): Promise<Product | null> {
          const product = await Product.findOneBy({_id})
         if (!product) {
             return null;
         }
-        if (typeof title !== undefined) {
-            Product.update({_id} ,{title});
+        if (typeof name !== undefined) {
+            Product.update({_id} ,{name});
         }
          return product
      }
@@ -44,20 +44,12 @@ export class ProductResolver {
      @Mutation(() => Boolean)
     async deleteProduct(
         @Arg('id') _id: number,
-        
      ): Promise<boolean> {
-        
-         
-         
          try {
             Product.delete({_id})
-            
          } catch (error) {
             return false;
          }
-         
-        
-       
          return true;
      }
 }

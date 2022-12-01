@@ -22,16 +22,16 @@ let ProductResolver = class ProductResolver {
     product(_id) {
         return Product_1.Product.findOneBy({ _id });
     }
-    async createProduct(title) {
-        return Product_1.Product.create({ title }).save();
+    async createProduct(name) {
+        return Product_1.Product.create({ name }).save();
     }
-    async updateProduct(_id, title) {
+    async updateProduct(_id, name) {
         const product = await Product_1.Product.findOneBy({ _id });
         if (!product) {
             return null;
         }
-        if (typeof title !== undefined) {
-            Product_1.Product.update({ _id }, { title });
+        if (typeof name !== undefined) {
+            Product_1.Product.update({ _id }, { name });
         }
         return product;
     }
@@ -60,7 +60,7 @@ __decorate([
 ], ProductResolver.prototype, "product", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Product_1.Product),
-    __param(0, (0, type_graphql_1.Arg)('title')),
+    __param(0, (0, type_graphql_1.Arg)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -68,7 +68,7 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Mutation)(() => Product_1.Product, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)('id')),
-    __param(1, (0, type_graphql_1.Arg)('title', () => String, { nullable: true })),
+    __param(1, (0, type_graphql_1.Arg)('name', () => String, { nullable: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)

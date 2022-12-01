@@ -12,7 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Product_1 = require("./Product");
+const EventUser_1 = require("./EventUser");
+const Shop_1 = require("./Shop");
 let User = class User extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -26,18 +27,27 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "name", void 0);
+__decorate([
     (0, typeorm_1.Column)({}),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => Product_1.Product, (product) => product.creator),
+    (0, typeorm_1.OneToMany)(() => Shop_1.Shop, (shop) => shop.creator),
     __metadata("design:type", Array)
-], User.prototype, "products", void 0);
+], User.prototype, "shops", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
-    (0, typeorm_1.CreateDateColumn)({ type: 'date' }),
+    (0, typeorm_1.CreateDateColumn)({ type: "date" }),
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => EventUser_1.EventUser, (eventUser) => eventUser.user),
+    __metadata("design:type", Array)
+], User.prototype, "eventUsers", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.UpdateDateColumn)(),
