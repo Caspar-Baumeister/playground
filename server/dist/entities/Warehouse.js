@@ -32,7 +32,7 @@ __decorate([
 ], Warehouse.prototype, "name", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(() => String),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Warehouse.prototype, "location", void 0);
 __decorate([

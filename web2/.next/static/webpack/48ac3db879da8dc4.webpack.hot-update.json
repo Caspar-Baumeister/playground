@@ -1,0 +1,1 @@
+{"c":["pages/index","webpack"],"r":[],"m":["./node_modules/@urql/exchange-graphcache/dist/urql-exchange-graphcache.mjs","./node_modules/next-urql/dist/next-urql.es.js","./node_modules/react-ssr-prepass/dist/react-ssr-prepass.es.js","./src/utils/betterUpdateQuery.tsx","./src/utils/createUrqlClient.ts"]}

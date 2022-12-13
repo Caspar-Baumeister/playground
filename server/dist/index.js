@@ -26,6 +26,7 @@ const PointOfSell_1 = require("./entities/PointOfSell");
 const Warehouse_1 = require("./entities/Warehouse");
 const WarehouseProduct_1 = require("./entities/WarehouseProduct");
 const Event_1 = require("./entities/Event");
+const warehouse_1 = require("./resolvers/warehouse");
 exports.dataSource = new typeorm_1.DataSource({
     type: "postgres",
     database: "playground",
@@ -50,7 +51,11 @@ const main = async () => {
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
     const redis = new ioredis_1.default();
-    app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }), (0, express_session_1.default)({
+    app.use((0, cors_1.default)({
+        origin: new RegExp("/*/"),
+        credentials: true,
+        methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    }), (0, express_session_1.default)({
         name: constants_1.COOKIE_NAME,
         store: new RedisStore({ client: redis, disableTouch: true }),
         saveUninitialized: false,
@@ -65,7 +70,12 @@ const main = async () => {
     }));
     const appoloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [product_1.ProductResolver, user_1.UserResolver, shop_1.ShopResolver],
+            resolvers: [
+                product_1.ProductResolver,
+                user_1.UserResolver,
+                shop_1.ShopResolver,
+                warehouse_1.WarehouseResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res, redis }),

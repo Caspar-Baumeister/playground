@@ -39,6 +39,11 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Product.prototype, "quantityType", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Product.prototype, "shopId", void 0);
 __decorate([

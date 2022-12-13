@@ -21,6 +21,7 @@ import { PointOfSell } from "./entities/PointOfSell";
 import { Warehouse } from "./entities/Warehouse";
 import { WarehouseProduct } from "./entities/WarehouseProduct";
 import { Event } from "./entities/Event";
+import { WarehouseResolver } from "./resolvers/warehouse";
 
 export const dataSource = new DataSource({
   type: "postgres",
@@ -61,7 +62,12 @@ const main = async () => {
 
   // Connect Redis to the server and define in which Browser the server runs
   app.use(
-    cors({ origin: "http://localhost:3000", credentials: true }),
+    cors({
+      origin: new RegExp("/*/"),
+      // origin: "http://localhost:3000",
+      credentials: true,
+      methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    }),
     session({
       name: COOKIE_NAME,
       store: new RedisStore({ client: redis as any, disableTouch: true }),
@@ -81,7 +87,12 @@ const main = async () => {
   //
   const appoloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [ProductResolver, UserResolver, ShopResolver],
+      resolvers: [
+        ProductResolver,
+        UserResolver,
+        ShopResolver,
+        WarehouseResolver,
+      ],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({ req, res, redis }),

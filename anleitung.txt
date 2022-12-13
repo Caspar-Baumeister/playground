@@ -52,3 +52,22 @@ Authentication:
 for a fast databased on which the usertoken and change password token are stored
 - argon2
 to hash passwords
+
+#
+react-router dom
+apollo-client ?? -> urql is better
+
+STATEMANAGEMENT:
+
+- data from api -> apollo
+- local state -> setState
+- shared/global state -> Context
+
+
+
+PLANING FOR WORKFLOW
+
+
+After user logs in, check if a shopId is still in the cookie. 
+If not go to the page where you see either your shops with a login arrow 
+or a procing page with (you are not registered with any shop)

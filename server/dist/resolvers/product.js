@@ -31,7 +31,7 @@ let ProductResolver = class ProductResolver {
             return null;
         }
         if (typeof name !== undefined) {
-            Product_1.Product.update({ _id }, { name });
+            await Product_1.Product.update({ _id }, { name });
         }
         return product;
     }
@@ -53,29 +53,29 @@ __decorate([
 ], ProductResolver.prototype, "products", null);
 __decorate([
     (0, type_graphql_1.Query)(() => Product_1.Product, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(0, (0, type_graphql_1.Arg)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "product", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Product_1.Product),
-    __param(0, (0, type_graphql_1.Arg)('name')),
+    __param(0, (0, type_graphql_1.Arg)("name")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "createProduct", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Product_1.Product, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('id')),
-    __param(1, (0, type_graphql_1.Arg)('name', () => String, { nullable: true })),
+    __param(0, (0, type_graphql_1.Arg)("id")),
+    __param(1, (0, type_graphql_1.Arg)("name", () => String, { nullable: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "updateProduct", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(0, (0, type_graphql_1.Arg)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)

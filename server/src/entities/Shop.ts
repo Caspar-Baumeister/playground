@@ -19,7 +19,7 @@ import { Warehouse } from "./Warehouse";
 export class Shop extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  _id!: number;
+  id!: number;
 
   @Field()
   @Column()

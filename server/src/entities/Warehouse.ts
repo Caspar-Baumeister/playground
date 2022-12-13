@@ -24,7 +24,7 @@ export class Warehouse extends BaseEntity {
   name!: string;
 
   @Field()
-  @Column(() => String)
+  @Column()
   location!: string;
 
   @Field()

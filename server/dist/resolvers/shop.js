@@ -13,12 +13,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShopResolver = void 0;
-const Shop_1 = require("../entities/Shop");
 const type_graphql_1 = require("type-graphql");
-const isAuth_1 = require("../middleware/isAuth");
 const __1 = require("..");
+const Shop_1 = require("../entities/Shop");
+const isAuth_1 = require("../middleware/isAuth");
 let ShopResolver = class ShopResolver {
-    shops(limit, { req }) {
+    myShops(limit, { req }) {
         const realLimit = Math.min(10, limit);
         return __1.dataSource
             .getRepository(Shop_1.Shop)
@@ -61,7 +61,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
-], ShopResolver.prototype, "shops", null);
+], ShopResolver.prototype, "myShops", null);
 __decorate([
     (0, type_graphql_1.Query)(() => Shop_1.Shop, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("id")),

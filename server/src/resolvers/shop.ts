@@ -1,4 +1,3 @@
-import { Shop } from "../entities/Shop";
 import {
   Arg,
   Ctx,
@@ -8,15 +7,24 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
+import { dataSource } from "..";
+import { Shop } from "../entities/Shop";
 import { isAuth } from "../middleware/isAuth";
 import { MyContext } from "../types";
-import { dataSource } from "..";
 // import { Product } from "src/entities/Product";
+
+// @ObjectType()
+// class ShopResponse {
+//   @Field(() => [FieldError], { nullable: true })
+//   errors?: FieldError[];
+//   @Field(() => Shop, { nullable: true })
+//   shop?: Shop;
+// }
 
 @Resolver()
 export class ShopResolver {
   @Query(() => [Shop])
-  shops(
+  myShops(
     @Arg("limit", () => Int) limit: number,
     @Ctx() { req }: MyContext
   ): Promise<Shop[]> {
@@ -84,4 +92,25 @@ export class ShopResolver {
     }
     return true;
   }
+
+  // @Mutation(() => ShopResponse)
+  // async loginShop(
+  //   @Arg("id") _id: number,
+  //   @Ctx() { req }: MyContext
+  // ): Promise<ShopResponse> {
+  //   const shop = await Shop.findOneBy({ _id });
+  //   if (!shop) {
+  //     return {
+  //       errors: [
+  //         {
+  //           field: "id",
+  //           message: "wrong id, no shop found",
+  //         },
+  //       ],
+  //     };
+  //   }
+
+  //   req.session.shopId = shop._id;
+  //   return { shop: shop };
+  // }
 }

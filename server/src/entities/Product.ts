@@ -30,6 +30,10 @@ export class Product extends BaseEntity {
 
   @Field()
   @Column()
+  quantityType!: string;
+
+  @Field()
+  @Column()
   shopId!: number;
 
   @ManyToOne(() => Shop, (shop) => shop.products)
