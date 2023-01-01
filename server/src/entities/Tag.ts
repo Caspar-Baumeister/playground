@@ -4,28 +4,28 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Product } from "./Product";
 import { Shop } from "./Shop";
-import { WarehouseProduct } from "./WarehouseProduct";
 
 @ObjectType()
 @Entity()
-export class Warehouse extends BaseEntity {
+export class Tag extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  _id!: number;
+  id!: number;
 
   @Field()
   @Column()
   name!: string;
 
-  @Field()
-  @Column()
-  location!: string;
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  description?: string;
 
   @Field()
   @Column()
@@ -34,11 +34,9 @@ export class Warehouse extends BaseEntity {
   @ManyToOne(() => Shop, (shop) => shop.products)
   shop: Shop;
 
-  @OneToMany(
-    () => WarehouseProduct,
-    (warehouseProduct) => warehouseProduct.warehouse
-  )
-  warehouseProducts: WarehouseProduct[];
+  @Field(() => [Product], { nullable: true })
+  @ManyToMany(() => Product, (product) => product.tags)
+  products: Product[];
 
   @Field(() => String)
   @CreateDateColumn()

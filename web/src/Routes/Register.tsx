@@ -34,7 +34,7 @@ const REGISTER = gql`
   mutation register($name: String!, $email: String!, $password: String!) {
     register(name: $name, email: $email, password: $password) {
       user {
-        _id
+        id
         name
         email
         createdAt
@@ -89,7 +89,7 @@ export default function Register() {
         });
       } else if (response?.data.register.user) {
         // a cooky is saved trough the successfull register function
-        navigate("/home");
+        navigate("/");
       } else {
         return response;
       }

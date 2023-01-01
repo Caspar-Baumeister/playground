@@ -18,7 +18,7 @@ import { User } from "./User";
 export class Event extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  _id!: number;
+  id!: number;
 
   @Field()
   @Column({ unique: true })
@@ -36,14 +36,16 @@ export class Event extends BaseEntity {
   @Column()
   creatorId!: string;
 
-  @ManyToOne(() => User, (user) => user.shops)
+  @ManyToOne(() => User, (user) => user.eventUsers)
   creator: User;
 
-  @OneToMany(() => Shop, (shop) => shop.creator)
-  shops: Shop[];
+  @ManyToOne(() => Shop, (shop) => shop.events)
+  shop: Shop;
 
   @OneToMany(() => EventUser, (eventUser) => eventUser.event)
   eventUsers: EventUser[];
+
+  //EVENT_PRODUCTS
 
   @Field(() => String)
   @CreateDateColumn({ type: "date" })

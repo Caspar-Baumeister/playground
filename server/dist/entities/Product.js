@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Product = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Category_1 = require("./Category");
 const Shop_1 = require("./Shop");
-const WarehouseProduct_1 = require("./WarehouseProduct");
+const Tag_1 = require("./Tag");
 let Product = class Product extends typeorm_1.BaseEntity {
     constructor() {
         super(...arguments);
@@ -25,7 +24,7 @@ __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Product.prototype, "_id", void 0);
+], Product.prototype, "id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
@@ -33,14 +32,19 @@ __decorate([
 ], Product.prototype, "name", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: "decimal" }),
     __metadata("design:type", Number)
-], Product.prototype, "usualPrice", void 0);
+], Product.prototype, "price", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)({ type: "decimal" }),
+    __metadata("design:type", Number)
+], Product.prototype, "amount", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Product.prototype, "quantityType", void 0);
+    __metadata("design:type", Number)
+], Product.prototype, "amountType", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
@@ -51,13 +55,11 @@ __decorate([
     __metadata("design:type", Shop_1.Shop)
 ], Product.prototype, "shop", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => Category_1.Category, (category) => category.products),
-    __metadata("design:type", Category_1.Category)
-], Product.prototype, "category", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => WarehouseProduct_1.WarehouseProduct, (warehouseProduct) => warehouseProduct.product),
+    (0, type_graphql_1.Field)(() => [Tag_1.Tag], { nullable: true }),
+    (0, typeorm_1.ManyToMany)(() => Tag_1.Tag, (tag) => tag.products),
+    (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
-], Product.prototype, "warehouseProducts", void 0);
+], Product.prototype, "tags", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)(),

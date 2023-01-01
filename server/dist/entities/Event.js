@@ -21,7 +21,7 @@ __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Event.prototype, "_id", void 0);
+], Event.prototype, "id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)({ unique: true }),
@@ -43,13 +43,13 @@ __decorate([
     __metadata("design:type", String)
 ], Event.prototype, "creatorId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.shops),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.eventUsers),
     __metadata("design:type", User_1.User)
 ], Event.prototype, "creator", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => Shop_1.Shop, (shop) => shop.creator),
-    __metadata("design:type", Array)
-], Event.prototype, "shops", void 0);
+    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.events),
+    __metadata("design:type", Shop_1.Shop)
+], Event.prototype, "shop", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => EventUser_1.EventUser, (eventUser) => eventUser.event),
     __metadata("design:type", Array)

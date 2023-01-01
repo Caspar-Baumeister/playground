@@ -9,12 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Warehouse = void 0;
+exports.ShopUser = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Shop_1 = require("./Shop");
-const WarehouseProduct_1 = require("./WarehouseProduct");
-let Warehouse = class Warehouse extends typeorm_1.BaseEntity {
+const User_1 = require("./User");
+let ShopUser = class ShopUser extends typeorm_1.BaseEntity {
     constructor() {
         super(...arguments);
         this.updatedAt = new Date();
@@ -22,45 +22,42 @@ let Warehouse = class Warehouse extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    (0, typeorm_1.PrimaryColumn)(),
     __metadata("design:type", Number)
-], Warehouse.prototype, "_id", void 0);
+], ShopUser.prototype, "userId", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => User_1.User),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.shopUsers),
+    __metadata("design:type", User_1.User)
+], ShopUser.prototype, "user", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Warehouse.prototype, "name", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Warehouse.prototype, "location", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.PrimaryColumn)(),
     __metadata("design:type", Number)
-], Warehouse.prototype, "shopId", void 0);
+], ShopUser.prototype, "shopId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.products),
+    (0, type_graphql_1.Field)(() => Shop_1.Shop),
+    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.users),
     __metadata("design:type", Shop_1.Shop)
-], Warehouse.prototype, "shop", void 0);
+], ShopUser.prototype, "shop", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => WarehouseProduct_1.WarehouseProduct, (warehouseProduct) => warehouseProduct.warehouse),
-    __metadata("design:type", Array)
-], Warehouse.prototype, "warehouseProducts", void 0);
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], ShopUser.prototype, "role", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], Warehouse.prototype, "createdAt", void 0);
+], ShopUser.prototype, "createdAt", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
-], Warehouse.prototype, "updatedAt", void 0);
-Warehouse = __decorate([
+], ShopUser.prototype, "updatedAt", void 0);
+ShopUser = __decorate([
     (0, type_graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)()
-], Warehouse);
-exports.Warehouse = Warehouse;
-//# sourceMappingURL=Warehouse.js.map
+], ShopUser);
+exports.ShopUser = ShopUser;
+//# sourceMappingURL=ShopUser.js.map

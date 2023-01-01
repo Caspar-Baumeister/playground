@@ -14,13 +14,14 @@ const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const EventUser_1 = require("./EventUser");
 const Shop_1 = require("./Shop");
+const ShopUser_1 = require("./ShopUser");
 let User = class User extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], User.prototype, "_id", void 0);
+], User.prototype, "id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)({ unique: true }),
@@ -36,9 +37,15 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(() => [Shop_1.Shop], { nullable: true }),
     (0, typeorm_1.OneToMany)(() => Shop_1.Shop, (shop) => shop.creator),
     __metadata("design:type", Array)
-], User.prototype, "shops", void 0);
+], User.prototype, "createdShops", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => [ShopUser_1.ShopUser], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => ShopUser_1.ShopUser, (shopUser) => shopUser.user),
+    __metadata("design:type", Array)
+], User.prototype, "shopUsers", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)({ type: "date" }),

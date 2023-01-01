@@ -162,7 +162,7 @@ export default function HomeLayout({ children }: Props) {
                       </Typography>
                     )
                   }
-                  id="demo-simple-select"
+                  id="shop-select"
                   value={shop?.id}
                   onChange={handleChangeShop}
                 >

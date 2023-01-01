@@ -1,7 +1,6 @@
 import { Box, Container, Toolbar } from "@mui/material";
 import React from "react";
 // import { useQuery, gql } from "@apollo/client";
-import PrimarySearchAppBar from "../Components/NavBar";
 import CustomPaginationActionsTable from "../Components/TableProducts";
 
 // Get the current active Shop
@@ -38,7 +37,6 @@ export default function Inventory() {
 
   return (
     <React.Fragment>
-      <PrimarySearchAppBar />
       <Box m={3}></Box>
       <CustomPaginationActionsTable />
     </React.Fragment>

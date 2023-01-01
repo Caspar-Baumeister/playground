@@ -4,33 +4,37 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Category } from "./Category";
 import { Shop } from "./Shop";
-import { WarehouseProduct } from "./WarehouseProduct";
+import { Tag } from "./Tag";
 
 @ObjectType()
 @Entity()
 export class Product extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  _id!: number;
+  id!: number;
 
   @Field()
   @Column()
   name!: string;
 
   @Field()
-  @Column()
-  usualPrice!: number;
+  @Column({ type: "decimal" })
+  price!: number;
+
+  @Field()
+  @Column({ type: "decimal" })
+  amount!: number;
 
   @Field()
   @Column()
-  quantityType!: string;
+  amountType!: number;
 
   @Field()
   @Column()
@@ -39,14 +43,10 @@ export class Product extends BaseEntity {
   @ManyToOne(() => Shop, (shop) => shop.products)
   shop: Shop;
 
-  @ManyToOne(() => Category, (category) => category.products)
-  category: Category;
-
-  @OneToMany(
-    () => WarehouseProduct,
-    (warehouseProduct) => warehouseProduct.product
-  )
-  warehouseProducts: WarehouseProduct[];
+  @Field(() => [Tag], { nullable: true })
+  @ManyToMany(() => Tag, (tag) => tag.products)
+  @JoinTable()
+  tags: Tag[];
 
   @Field(() => String)
   @CreateDateColumn()

@@ -10,13 +10,14 @@ import {
 } from "typeorm";
 import { EventUser } from "./EventUser";
 import { Shop } from "./Shop";
+import { ShopUser } from "./ShopUser";
 
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  _id!: number;
+  id!: number;
 
   @Field()
   @Column({ unique: true })
@@ -29,8 +30,13 @@ export class User extends BaseEntity {
   @Column({})
   password!: string;
 
+  @Field(() => [Shop], { nullable: true })
   @OneToMany(() => Shop, (shop) => shop.creator)
-  shops: Shop[];
+  createdShops: Shop[];
+
+  @Field(() => [ShopUser], { nullable: true })
+  @OneToMany(() => ShopUser, (shopUser) => shopUser.user)
+  shopUsers: ShopUser[];
 
   @Field(() => String)
   @CreateDateColumn({ type: "date" })

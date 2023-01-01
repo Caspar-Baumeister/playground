@@ -33,7 +33,7 @@ const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       user {
-        _id
+        id
         name
         email
         createdAt
@@ -82,7 +82,7 @@ export default function Login() {
         });
       } else if (response?.data.login.user) {
         // a cooky is saved trough the successfull login function
-        navigate("/home");
+        navigate("/");
       }
       return response;
     },

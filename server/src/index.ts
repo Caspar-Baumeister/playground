@@ -1,27 +1,26 @@
-import { COOKIE_NAME, __prod__ } from "./constants";
-import express, { Express } from "express";
-import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
-import { buildSchema } from "type-graphql";
-import { ProductResolver } from "./resolvers/product";
-import { UserResolver } from "./resolvers/user";
-import session from "express-session";
 import connectRedis from "connect-redis";
-import Redis from "ioredis";
-import { MyContext } from "./types";
 import cors from "cors";
+import express, { Express } from "express";
+import session from "express-session";
+import Redis from "ioredis";
+import "reflect-metadata";
+import { buildSchema } from "type-graphql";
 import { DataSource } from "typeorm";
-import { Product } from "./entities/Product";
-import { User } from "./entities/User";
-import { Shop } from "./entities/Shop";
-import { ShopResolver } from "./resolvers/shop";
-import { Category } from "./entities/Category";
+import { COOKIE_NAME, __prod__ } from "./constants";
+import { Event } from "./entities/Event";
 import { EventUser } from "./entities/EventUser";
 import { PointOfSell } from "./entities/PointOfSell";
-import { Warehouse } from "./entities/Warehouse";
-import { WarehouseProduct } from "./entities/WarehouseProduct";
-import { Event } from "./entities/Event";
-import { WarehouseResolver } from "./resolvers/warehouse";
+import { Product } from "./entities/Product";
+import { Shop } from "./entities/Shop";
+import { ShopUser } from "./entities/ShopUser";
+import { Tag } from "./entities/Tag";
+import { User } from "./entities/User";
+import { ProductResolver } from "./resolvers/product";
+import { ShopResolver } from "./resolvers/shop";
+import { TagResolver } from "./resolvers/tag";
+import { UserResolver } from "./resolvers/user";
+import { MyContext } from "./types";
 
 export const dataSource = new DataSource({
   type: "postgres",
@@ -30,17 +29,7 @@ export const dataSource = new DataSource({
   password: "C4sp4R123",
   logging: true,
   synchronize: true,
-  entities: [
-    Product,
-    User,
-    Shop,
-    Category,
-    Event,
-    EventUser,
-    PointOfSell,
-    Warehouse,
-    WarehouseProduct,
-  ],
+  entities: [Product, User, Shop, Event, EventUser, PointOfSell, Tag, ShopUser],
 });
 
 const main = async () => {
@@ -87,12 +76,7 @@ const main = async () => {
   //
   const appoloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [
-        ProductResolver,
-        UserResolver,
-        ShopResolver,
-        WarehouseResolver,
-      ],
+      resolvers: [ProductResolver, UserResolver, ShopResolver, TagResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({ req, res, redis }),

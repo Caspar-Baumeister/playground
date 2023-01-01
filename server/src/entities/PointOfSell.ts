@@ -15,7 +15,7 @@ import { Shop } from "./Shop";
 export class PointOfSell extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  _id!: number;
+  id!: number;
 
   @Field()
   @Column()

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 const MY_SHOPS = gql`
-  query MyShops($limit: Int!) {
-    myShops(limit: $limit) {
+  query MyShops {
+    myShops {
       id
       name
       creatorId

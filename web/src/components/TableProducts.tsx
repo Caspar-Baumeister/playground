@@ -1,8 +1,9 @@
 import * as React from "react";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import SearchIcon from "@mui/icons-material/Search";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
@@ -20,6 +21,11 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
+import { alpha, Grid } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
+import CreateProductPopUpForm from "./CreateProductPopUpForm";
+import CreateTagPopUpForm from "./CreateTagPopUpForm";
 
 interface Data {
   usualPrice: number;
@@ -154,6 +160,46 @@ interface EnhancedTableProps {
   rowCount: number;
 }
 
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  // width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    // marginLeft: theme.spacing(3),
+    width: "auto",
+  },
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("md")]: {
+      width: "20ch",
+    },
+  },
+}));
+
 function EnhancedTableHead(props: EnhancedTableProps) {
   const {
     onSelectAllClick,
@@ -220,13 +266,13 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
+        // ...(numSelected > 0 && {
+        //   bgcolor: (theme) =>
+        //     alpha(
+        //       theme.palette.primary.main,
+        //       theme.palette.action.activatedOpacity
+        //     ),
+        // }),
       }}
     >
       {numSelected > 0 ? (
@@ -236,17 +282,32 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           variant="subtitle1"
           component="div"
         >
-          {numSelected} selected
+          {numSelected} ausgewählt
         </Typography>
       ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Bergkäse
-        </Typography>
+        <Grid container>
+          <Grid item>
+            <Tooltip title="Filter list">
+              <IconButton>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+          <Grid item xs={0}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+              />
+            </Search>
+          </Grid>
+        </Grid>
+        // <Grid sx={{ flex: "1 1 100%" }}>
+
+        // </Grid>
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
@@ -255,11 +316,20 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <Box width={300}>
+          <Grid container style={{ gap: 20 }}>
+            <Grid>
+              <Tooltip title="Filter list">
+                <CreateProductPopUpForm />
+              </Tooltip>
+            </Grid>
+            <Grid>
+              <Tooltip title="Filter list">
+                <CreateTagPopUpForm />
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Box>
       )}
     </Toolbar>
   );
@@ -417,7 +487,7 @@ export default function EnhancedTable() {
       </Paper>
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
+        label="kompackte Ansicht"
       />
     </Box>
   );

@@ -1,7 +1,6 @@
 import {
   Arg,
   Ctx,
-  Int,
   Mutation,
   Query,
   Resolver,
@@ -11,52 +10,36 @@ import { dataSource } from "..";
 import { Shop } from "../entities/Shop";
 import { isAuth } from "../middleware/isAuth";
 import { MyContext } from "../types";
-// import { Product } from "src/entities/Product";
-
-// @ObjectType()
-// class ShopResponse {
-//   @Field(() => [FieldError], { nullable: true })
-//   errors?: FieldError[];
-//   @Field(() => Shop, { nullable: true })
-//   shop?: Shop;
-// }
 
 @Resolver()
 export class ShopResolver {
+  // queries all shops
   @Query(() => [Shop])
-  myShops(
-    @Arg("limit", () => Int) limit: number,
-    @Ctx() { req }: MyContext
-  ): Promise<Shop[]> {
-    const realLimit = Math.min(10, limit);
+  shops(): Promise<Shop[]> {
     return dataSource
       .getRepository(Shop)
       .createQueryBuilder("shop")
-      .where("shop.creatorId = :id", { id: req.session.userId })
-      .orderBy('"updatedAt"', "DESC")
-      .take(realLimit)
+      .leftJoinAndSelect("shop.creator", "creator")
       .getMany();
   }
 
-  // // get all shop products
-  // @Query(() => [Product])
-  // shopProducts(
-  //   @Arg("limit", () => Int) limit: number,
-  //   @Ctx() { req }: MyContext
-  // ): Promise<Product[]> {
-  //   const realLimit = Math.min(10, limit);
-  //   return dataSource
-  //     .getRepository(Shop)
-  //     .createQueryBuilder("shop")
-  //     .where("shop.creatorId = :id", { id: req.session.userId })
-  //     .orderBy('"updatedAt"', "DESC")
-  //     .take(realLimit)
-  //     .getMany();
-  // }
+  @Query(() => [Shop])
+  myShops(@Ctx() { req }: MyContext): Promise<Shop[]> {
+    return (
+      dataSource
+        .getRepository(Shop)
+        .createQueryBuilder("shop")
+        .leftJoinAndSelect("shop.creator", "creator")
+        .where("shop.creatorId = :id", { id: req.session.userId })
+        // .andWhere("creator.attribut = :isRemoved", { isRemoved: false })
+        .orderBy('shop."updatedAt"', "DESC")
+        .getMany()
+    );
+  }
 
   @Query(() => Shop, { nullable: true })
-  shop(@Arg("id") _id: number): Promise<Shop | null> {
-    return Shop.findOneBy({ _id });
+  shop(@Arg("id") id: number): Promise<Shop | null> {
+    return Shop.findOneBy({ id });
   }
 
   @Mutation(() => Shop)
@@ -70,47 +53,26 @@ export class ShopResolver {
 
   @Mutation(() => Shop, { nullable: true })
   async updateShop(
-    @Arg("id") _id: number,
+    @Arg("id") id: number,
     @Arg("name", () => String, { nullable: true }) name: string
   ): Promise<Shop | null> {
-    const shop = await Shop.findOneBy({ _id });
+    const shop = await Shop.findOneBy({ id });
     if (!shop) {
       return null;
     }
     if (typeof name !== undefined) {
-      Shop.update({ _id }, { name });
+      Shop.update({ id }, { name });
     }
     return shop;
   }
 
   @Mutation(() => Boolean)
-  async deleteShop(@Arg("id") _id: number): Promise<boolean> {
+  async deleteShop(@Arg("id") id: number): Promise<boolean> {
     try {
-      Shop.delete({ _id });
+      Shop.delete({ id });
     } catch (error) {
       return false;
     }
     return true;
   }
-
-  // @Mutation(() => ShopResponse)
-  // async loginShop(
-  //   @Arg("id") _id: number,
-  //   @Ctx() { req }: MyContext
-  // ): Promise<ShopResponse> {
-  //   const shop = await Shop.findOneBy({ _id });
-  //   if (!shop) {
-  //     return {
-  //       errors: [
-  //         {
-  //           field: "id",
-  //           message: "wrong id, no shop found",
-  //         },
-  //       ],
-  //     };
-  //   }
-
-  //   req.session.shopId = shop._id;
-  //   return { shop: shop };
-  // }
 }

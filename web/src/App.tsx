@@ -23,10 +23,6 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/home",
-        element: <Users />,
-      },
-      {
         path: "/inventory",
         element: <Inventory />,
       },
@@ -37,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/tickets",
         element: <div>employees</div>,
+      },
+      {
+        path: "/",
+        element: <Users />,
       },
     ],
   },

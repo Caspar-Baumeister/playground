@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Shop = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Category_1 = require("./Category");
+const Event_1 = require("./Event");
 const Product_1 = require("./Product");
+const ShopUser_1 = require("./ShopUser");
+const Tag_1 = require("./Tag");
 const User_1 = require("./User");
-const Warehouse_1 = require("./Warehouse");
 let Shop = class Shop extends typeorm_1.BaseEntity {
     constructor() {
         super(...arguments);
@@ -38,21 +39,30 @@ __decorate([
     __metadata("design:type", Number)
 ], Shop.prototype, "creatorId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.shops),
+    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.createdShops, { onDelete: "SET NULL" }),
     __metadata("design:type", User_1.User)
 ], Shop.prototype, "creator", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(() => [Product_1.Product], { nullable: true }),
     (0, typeorm_1.OneToMany)(() => Product_1.Product, (product) => product.shop),
     __metadata("design:type", Array)
 ], Shop.prototype, "products", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => Category_1.Category, (category) => category.shop),
+    (0, type_graphql_1.Field)(() => [Tag_1.Tag], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => Tag_1.Tag, (tag) => tag.shop),
     __metadata("design:type", Array)
-], Shop.prototype, "categories", void 0);
+], Shop.prototype, "tags", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => Warehouse_1.Warehouse, (warehouse) => warehouse.shop),
+    (0, type_graphql_1.Field)(() => [Event_1.Event], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => Event_1.Event, (event) => event.shop),
     __metadata("design:type", Array)
-], Shop.prototype, "warehouses", void 0);
+], Shop.prototype, "events", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => [ShopUser_1.ShopUser], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => ShopUser_1.ShopUser, (shopUser) => shopUser.shop),
+    __metadata("design:type", Array)
+], Shop.prototype, "users", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)(),

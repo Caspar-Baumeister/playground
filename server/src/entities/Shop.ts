@@ -9,10 +9,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Category } from "./Category";
+import { Event } from "./Event";
 import { Product } from "./Product";
+import { ShopUser } from "./ShopUser";
+import { Tag } from "./Tag";
 import { User } from "./User";
-import { Warehouse } from "./Warehouse";
 
 @ObjectType()
 @Entity()
@@ -29,17 +30,25 @@ export class Shop extends BaseEntity {
   @Column()
   creatorId!: number;
 
-  @ManyToOne(() => User, (user) => user.shops)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, (user) => user.createdShops, { onDelete: "SET NULL" })
   creator: User;
 
+  @Field(() => [Product], { nullable: true })
   @OneToMany(() => Product, (product) => product.shop)
   products: Product[];
 
-  @OneToMany(() => Category, (category) => category.shop)
-  categories: Category[];
+  @Field(() => [Tag], { nullable: true })
+  @OneToMany(() => Tag, (tag) => tag.shop)
+  tags: Tag[];
 
-  @OneToMany(() => Warehouse, (warehouse) => warehouse.shop)
-  warehouses: Warehouse[];
+  @Field(() => [Event], { nullable: true })
+  @OneToMany(() => Event, (event) => event.shop)
+  events: Event[];
+
+  @Field(() => [ShopUser], { nullable: true })
+  @OneToMany(() => ShopUser, (shopUser) => shopUser.shop)
+  users: ShopUser[];
 
   @Field(() => String)
   @CreateDateColumn()

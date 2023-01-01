@@ -60,7 +60,7 @@ export class UserResolver {
     if (!req.session.userId) {
       return null;
     }
-    return await User.findOneBy({ _id: req.session.userId });
+    return await User.findOneBy({ id: req.session.userId });
   }
 
   @Mutation(() => UserResponse)
@@ -91,8 +91,8 @@ export class UserResolver {
         ],
       };
     }
-    const _id = parseInt(userId);
-    const user = await User.findOneBy({ _id });
+    const id = parseInt(userId);
+    const user = await User.findOneBy({ id });
     if (!user) {
       return {
         errors: [
@@ -103,7 +103,7 @@ export class UserResolver {
         ],
       };
     }
-    await User.update({ _id }, { password: await argon2.hash(newPassword) });
+    await User.update({ id }, { password: await argon2.hash(newPassword) });
     req.session.userId = parseInt(userId);
     await redis.del(key);
     return { user: user };
@@ -121,7 +121,7 @@ export class UserResolver {
     const token = v4();
     await redis.set(
       FORGET_PASSWORD_PREFIX + token,
-      user._id,
+      user.id,
       "EX",
       1000 * 60 * 60 * 24 * 3
     ); // 3 DAYS
@@ -209,7 +209,7 @@ export class UserResolver {
         ],
       };
     }
-    req.session.userId = user._id;
+    req.session.userId = user.id;
     console.log(req.session.userId);
     return { user: user };
   }
@@ -243,7 +243,7 @@ export class UserResolver {
       };
     }
 
-    req.session.userId = user._id;
+    req.session.userId = user.id;
     return { user: user };
   }
 

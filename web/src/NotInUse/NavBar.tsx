@@ -98,11 +98,11 @@ export default function PrimarySearchAppBar() {
           <Toolbar>
             <FormControl sx={{ width: 200 }}>
               <Select
-                labelId="demo-simple-select-label"
+                labelId="warehouse-select-label"
                 renderValue={(value) =>
                   value ? value : <em>Select a warehouse</em>
                 }
-                id="demo-simple-select"
+                id="warehouse-select"
                 value={currentWarehouse}
                 onChange={handleChangeWarehouse}
               >
@@ -121,13 +121,13 @@ export default function PrimarySearchAppBar() {
               />
             </Search>
             <Box sx={{ flexGrow: 1 }} />
-
-            <IconButton color="inherit">
+            {/* <PopUpForm /> */}
+            {/* <IconButton color="inherit">
               <AddIcon />
               <Typography color="inherit" noWrap sx={{ flexGrow: 1 }}>
                 Create Product
               </Typography>
-            </IconButton>
+            </IconButton> */}
           </Toolbar>
         </AppBar>
       </HideOnScroll>

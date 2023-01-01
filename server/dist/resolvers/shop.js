@@ -18,35 +18,41 @@ const __1 = require("..");
 const Shop_1 = require("../entities/Shop");
 const isAuth_1 = require("../middleware/isAuth");
 let ShopResolver = class ShopResolver {
-    myShops(limit, { req }) {
-        const realLimit = Math.min(10, limit);
+    shops() {
         return __1.dataSource
             .getRepository(Shop_1.Shop)
             .createQueryBuilder("shop")
-            .where("shop.creatorId = :id", { id: req.session.userId })
-            .orderBy('"updatedAt"', "DESC")
-            .take(realLimit)
+            .leftJoinAndSelect("shop.creator", "creator")
             .getMany();
     }
-    shop(_id) {
-        return Shop_1.Shop.findOneBy({ _id });
+    myShops({ req }) {
+        return (__1.dataSource
+            .getRepository(Shop_1.Shop)
+            .createQueryBuilder("shop")
+            .leftJoinAndSelect("shop.creator", "creator")
+            .where("shop.creatorId = :id", { id: req.session.userId })
+            .orderBy('shop."updatedAt"', "DESC")
+            .getMany());
+    }
+    shop(id) {
+        return Shop_1.Shop.findOneBy({ id });
     }
     async createShop(name, { req }) {
         return Shop_1.Shop.create({ name, creatorId: req.session.userId }).save();
     }
-    async updateShop(_id, name) {
-        const shop = await Shop_1.Shop.findOneBy({ _id });
+    async updateShop(id, name) {
+        const shop = await Shop_1.Shop.findOneBy({ id });
         if (!shop) {
             return null;
         }
         if (typeof name !== undefined) {
-            Shop_1.Shop.update({ _id }, { name });
+            Shop_1.Shop.update({ id }, { name });
         }
         return shop;
     }
-    async deleteShop(_id) {
+    async deleteShop(id) {
         try {
-            Shop_1.Shop.delete({ _id });
+            Shop_1.Shop.delete({ id });
         }
         catch (error) {
             return false;
@@ -56,10 +62,15 @@ let ShopResolver = class ShopResolver {
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [Shop_1.Shop]),
-    __param(0, (0, type_graphql_1.Arg)("limit", () => type_graphql_1.Int)),
-    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ShopResolver.prototype, "shops", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => [Shop_1.Shop]),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ShopResolver.prototype, "myShops", null);
 __decorate([

@@ -56,7 +56,7 @@ let UserResolver = class UserResolver {
         if (!req.session.userId) {
             return null;
         }
-        return await User_1.User.findOneBy({ _id: req.session.userId });
+        return await User_1.User.findOneBy({ id: req.session.userId });
     }
     async changePassword(token, newPassword, { redis, req }) {
         if (newPassword.length < 2) {
@@ -81,8 +81,8 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        const _id = parseInt(userId);
-        const user = await User_1.User.findOneBy({ _id });
+        const id = parseInt(userId);
+        const user = await User_1.User.findOneBy({ id });
         if (!user) {
             return {
                 errors: [
@@ -93,7 +93,7 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        await User_1.User.update({ _id }, { password: await argon2_1.default.hash(newPassword) });
+        await User_1.User.update({ id }, { password: await argon2_1.default.hash(newPassword) });
         req.session.userId = parseInt(userId);
         await redis.del(key);
         return { user: user };
@@ -104,7 +104,7 @@ let UserResolver = class UserResolver {
             return true;
         }
         const token = (0, uuid_1.v4)();
-        await redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user._id, "EX", 1000 * 60 * 60 * 24 * 3);
+        await redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user.id, "EX", 1000 * 60 * 60 * 24 * 3);
         (0, sendEmail_1.sendEmail)(email, `<a href= "http://localhost:3000/change-password/${token}"> reset password </a>`);
         return true;
     }
@@ -169,7 +169,7 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        req.session.userId = user._id;
+        req.session.userId = user.id;
         console.log(req.session.userId);
         return { user: user };
     }
@@ -196,7 +196,7 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        req.session.userId = user._id;
+        req.session.userId = user.id;
         return { user: user };
     }
     logout({ req, res }) {

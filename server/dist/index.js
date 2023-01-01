@@ -4,29 +4,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dataSource = void 0;
-const constants_1 = require("./constants");
-const express_1 = __importDefault(require("express"));
-require("reflect-metadata");
 const apollo_server_express_1 = require("apollo-server-express");
-const type_graphql_1 = require("type-graphql");
-const product_1 = require("./resolvers/product");
-const user_1 = require("./resolvers/user");
-const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
-const ioredis_1 = __importDefault(require("ioredis"));
 const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
+const express_session_1 = __importDefault(require("express-session"));
+const ioredis_1 = __importDefault(require("ioredis"));
+require("reflect-metadata");
+const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Product_1 = require("./entities/Product");
-const User_1 = require("./entities/User");
-const Shop_1 = require("./entities/Shop");
-const shop_1 = require("./resolvers/shop");
-const Category_1 = require("./entities/Category");
+const constants_1 = require("./constants");
+const Event_1 = require("./entities/Event");
 const EventUser_1 = require("./entities/EventUser");
 const PointOfSell_1 = require("./entities/PointOfSell");
-const Warehouse_1 = require("./entities/Warehouse");
-const WarehouseProduct_1 = require("./entities/WarehouseProduct");
-const Event_1 = require("./entities/Event");
-const warehouse_1 = require("./resolvers/warehouse");
+const Product_1 = require("./entities/Product");
+const Shop_1 = require("./entities/Shop");
+const ShopUser_1 = require("./entities/ShopUser");
+const Tag_1 = require("./entities/Tag");
+const User_1 = require("./entities/User");
+const product_1 = require("./resolvers/product");
+const shop_1 = require("./resolvers/shop");
+const tag_1 = require("./resolvers/tag");
+const user_1 = require("./resolvers/user");
 exports.dataSource = new typeorm_1.DataSource({
     type: "postgres",
     database: "playground",
@@ -34,17 +33,7 @@ exports.dataSource = new typeorm_1.DataSource({
     password: "C4sp4R123",
     logging: true,
     synchronize: true,
-    entities: [
-        Product_1.Product,
-        User_1.User,
-        Shop_1.Shop,
-        Category_1.Category,
-        Event_1.Event,
-        EventUser_1.EventUser,
-        PointOfSell_1.PointOfSell,
-        Warehouse_1.Warehouse,
-        WarehouseProduct_1.WarehouseProduct,
-    ],
+    entities: [Product_1.Product, User_1.User, Shop_1.Shop, Event_1.Event, EventUser_1.EventUser, PointOfSell_1.PointOfSell, Tag_1.Tag, ShopUser_1.ShopUser],
 });
 const main = async () => {
     await exports.dataSource.initialize();
@@ -70,12 +59,7 @@ const main = async () => {
     }));
     const appoloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [
-                product_1.ProductResolver,
-                user_1.UserResolver,
-                shop_1.ShopResolver,
-                warehouse_1.WarehouseResolver,
-            ],
+            resolvers: [product_1.ProductResolver, user_1.UserResolver, shop_1.ShopResolver, tag_1.TagResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res, redis }),
