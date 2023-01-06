@@ -27,11 +27,17 @@ let ProductResolver = class ProductResolver {
             .getRepository(Product_1.Product)
             .createQueryBuilder("product")
             .where("product.shopId = :id", { id: shopId })
-            .orderBy('"updatedAt"', "DESC")
+            .leftJoinAndSelect("product.tags", "tags")
+            .orderBy('product."updatedAt"', "DESC")
             .getMany();
     }
     product(id) {
-        return Product_1.Product.findOneBy({ id });
+        return __1.dataSource
+            .getRepository(Product_1.Product)
+            .createQueryBuilder("product")
+            .where("product.id = :id", { id: id })
+            .leftJoinAndSelect("product.tags", "tags")
+            .getOne();
     }
     async createProduct(name, price, amount, amountType, shopId, tags) {
         const product = Product_1.Product.create({
@@ -44,25 +50,27 @@ let ProductResolver = class ProductResolver {
         product.tags = await Tag_1.Tag.findBy({ id: (0, typeorm_1.In)(tags) });
         return product.save();
     }
-    async updateProductAmount(id, price) {
+    async updateProduct(id, name, price, amount, amountType, tags) {
         const product = await Product_1.Product.findOneBy({ id });
         if (!product) {
             return null;
         }
-        if (typeof price !== undefined) {
-            await Product_1.Product.update({ id }, { price });
+        if (name) {
+            product.name = name;
         }
-        return product;
-    }
-    async updateProductPrice(id, amount) {
-        const product = await Product_1.Product.findOneBy({ id });
-        if (!product) {
-            return null;
+        if (price >= 0) {
+            product.price = price;
         }
-        if (typeof amount !== undefined) {
-            await Product_1.Product.update({ id }, { amount });
+        if (amount >= 0) {
+            product.amount = amount;
         }
-        return product;
+        if (amountType == 1 || amountType == 0) {
+            product.amountType = amountType;
+        }
+        if (tags) {
+            product.tags = await Tag_1.Tag.findBy({ id: (0, typeorm_1.In)(tags) });
+        }
+        return product.save();
     }
     async deleteProduct(id) {
         try {
@@ -107,24 +115,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "createProduct", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => Product_1.Product, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("id")),
-    __param(1, (0, type_graphql_1.Arg)("price", () => type_graphql_1.Float, { nullable: true })),
+    (0, type_graphql_1.Mutation)(() => Product_1.Product),
+    __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.ID)),
+    __param(1, (0, type_graphql_1.Arg)("name", { nullable: true })),
+    __param(2, (0, type_graphql_1.Arg)("price", () => type_graphql_1.Float, { nullable: true })),
+    __param(3, (0, type_graphql_1.Arg)("amount", () => type_graphql_1.Float, { nullable: true })),
+    __param(4, (0, type_graphql_1.Arg)("amountType", { nullable: true })),
+    __param(5, (0, type_graphql_1.Arg)("tags", () => [type_graphql_1.ID], { nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:paramtypes", [Number, String, Number, Number, Number, Array]),
     __metadata("design:returntype", Promise)
-], ProductResolver.prototype, "updateProductAmount", null);
-__decorate([
-    (0, type_graphql_1.Mutation)(() => Product_1.Product, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("id")),
-    __param(1, (0, type_graphql_1.Arg)("amount", () => type_graphql_1.Float, { nullable: true })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
-    __metadata("design:returntype", Promise)
-], ProductResolver.prototype, "updateProductPrice", null);
+], ProductResolver.prototype, "updateProduct", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.ID)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)

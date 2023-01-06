@@ -4,6 +4,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
+import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
@@ -11,15 +12,31 @@ import { useFormik } from "formik";
 import * as React from "react";
 import * as yup from "yup";
 import SecectTags from "./SelectTags";
-import { useMutation } from "@apollo/client";
-import { CREATE_PRODUCT } from "../graphql/mutations/product";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { UPDATE_PRODUCT } from "../graphql/mutations/product";
 import { ShopContext } from "../utiles/ShopContext";
-import PRODUCTS_BY_SHOP_ID from "../graphql/queries/product";
+import PRODUCTS_BY_SHOP_ID, { PRODUCT } from "../graphql/queries/product";
+import { TagsData } from "./TableProducts";
 
-export default function CreateProductPopUpForm() {
+type propsType = {
+  productId: number;
+};
+
+export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
   const shopState = React.useContext(ShopContext);
-  // create product mutation
-  const [saveProduct, { error, data }] = useMutation(CREATE_PRODUCT, {
+
+  const [
+    getProduct,
+    { loading: loadingProduct, error: errorProduct, data: dataProduct },
+  ] = useLazyQuery(PRODUCT, {
+    variables: { id: props.productId },
+  });
+
+  // update product mutation
+  const [
+    updateProduct,
+    { error: errorUpdateProduct, data: dataUpdateProduct },
+  ] = useMutation(UPDATE_PRODUCT, {
     refetchQueries: [
       {
         query: PRODUCTS_BY_SHOP_ID,
@@ -30,19 +47,6 @@ export default function CreateProductPopUpForm() {
 
   const [open, setOpen] = React.useState(false);
   const [tags, setTags] = React.useState<number[]>([]);
-
-  // const [InWeight, setInWeight] = React.useState(1);
-
-  //   const { loading, error, data } = useQuery(MY_SHOPS, {
-  //     variables: { limit: 10 },
-  //   });
-
-  // const handleSwitch = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setState({
-  //     ...state,
-  //     [event.target.name]: event.target.checked,
-  //   });
-  // };
 
   const validationSchema = yup.object({
     name: yup.string().required("Ein Produktname wird benötigt"),
@@ -59,6 +63,7 @@ export default function CreateProductPopUpForm() {
     amountType: number | undefined;
     amount: number | undefined;
     price: number | undefined;
+    tags: TagsData[];
   }
 
   const initialValues: valuesTypes = {
@@ -67,31 +72,52 @@ export default function CreateProductPopUpForm() {
     amountType: 0,
     amount: undefined,
     price: undefined,
+    tags: [],
   };
 
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
-      const response = await saveProduct({
-        variables: { ...values, tags: tags },
+      console.log("values", values);
+      const response = await updateProduct({
+        variables: { ...values, tags: tags, id: props.productId },
       });
       console.log(response);
     },
   });
 
+  React.useEffect(() => {
+    if (dataProduct) {
+      const realInitialValues: valuesTypes = dataProduct.product;
+      console.log("type", realInitialValues.amountType);
+      formik.setFieldValue("name", realInitialValues.name);
+      formik.setFieldValue("amount", realInitialValues.amount);
+      formik.setFieldValue("price", realInitialValues.price);
+      formik.setFieldValue("tags", realInitialValues.tags);
+      formik.setFieldValue("amountType", realInitialValues.amountType);
+
+      if (realInitialValues.tags) {
+        setTags(realInitialValues.tags.map((tag) => tag.id));
+      }
+    }
+  }, [dataProduct]);
+
   return (
-    <div>
-      <Button
-        onClick={() => setOpen(true)}
-        sx={{ borderRadius: 10 }}
-        variant="contained"
-        startIcon={<AddIcon />}
+    <>
+      <IconButton
+        size="small"
+        onClick={() => {
+          getProduct();
+          setOpen(true);
+        }}
       >
-        Produkt
-      </Button>
-      <Dialog open={open} onClose={() => setOpen(false)}>
+        <EditIcon sx={{ fontSize: "18px" }} />
+      </IconButton>
+      <Dialog
+        open={open && !loadingProduct && dataProduct}
+        onClose={() => setOpen(false)}
+      >
         <DialogTitle>Neues Produkt</DialogTitle>
 
         <form onSubmit={formik.handleSubmit}>
@@ -166,20 +192,20 @@ export default function CreateProductPopUpForm() {
                 setTags(event);
                 console.log(tags);
               }}
-              initialTags={[]}
+              initialTags={tags}
             />
-            {error ? (
+            {errorProduct ? (
               <span style={{ color: "green" }}>
                 <DialogContentText>
-                  Dies ging schief! {error.message}
+                  Dies ging schief! {errorProduct.message}
                 </DialogContentText>
               </span>
             ) : null}
-            {data && data.createProduct ? (
+            {dataUpdateProduct && dataUpdateProduct.product ? (
               <DialogContentText p={3}>
                 <span style={{ color: "green" }}>
                   {" "}
-                  Das Produkt {data.createProduct.name} wurde erfolgreich
+                  Das Produkt {dataUpdateProduct.product.name} wurde erfolgreich
                   erstellt!
                 </span>
               </DialogContentText>
@@ -187,10 +213,10 @@ export default function CreateProductPopUpForm() {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpen(false)}>Schließen</Button>
-            <Button type="submit">Erstellen</Button>
+            <Button type="submit">Bestätigen</Button>
           </DialogActions>
         </form>
       </Dialog>
-    </div>
+    </>
   );
-}
+};

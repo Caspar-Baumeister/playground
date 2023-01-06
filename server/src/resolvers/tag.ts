@@ -26,7 +26,9 @@ export class TagResolver {
       .createQueryBuilder("tag")
       .where("tag.shopId = :id", { id: shopId })
       .leftJoinAndSelect("tag.products", "product")
+      .leftJoinAndSelect("product.tags", "tags")
       .orderBy("tag.updatedAt", "DESC")
+      .orderBy("product.updatedAt", "DESC")
       .getMany();
   }
 
@@ -41,7 +43,9 @@ export class TagResolver {
       .where("tag.shopId = :id", { id: shopId })
       .where("tag.id IN(:...ids)", { ids })
       .leftJoinAndSelect("tag.products", "product")
+      .leftJoinAndSelect("product.tags", "tags")
       .orderBy("tag.updatedAt", "DESC")
+      .orderBy("product.updatedAt", "DESC")
       .getMany();
   }
 

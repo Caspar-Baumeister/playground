@@ -25,6 +25,7 @@ const MenuProps = {
 
 interface handleTagChangeProps {
   handleTagChange: (tags: number[]) => any;
+  initialTags: number[] | undefined;
 }
 
 export type TagType = {
@@ -32,7 +33,10 @@ export type TagType = {
   id: number;
 };
 
-export default function SecectTags({ handleTagChange }: handleTagChangeProps) {
+export default function SecectTags({
+  handleTagChange,
+  initialTags,
+}: handleTagChangeProps) {
   const shopState = React.useContext(ShopContext);
 
   // var allTags: TagType[] = data.tagsByShopId;
@@ -43,20 +47,22 @@ export default function SecectTags({ handleTagChange }: handleTagChangeProps) {
 
   React.useEffect(() => {
     if (!error && !loading) {
-      console.log("onCompleted", data);
       setAllTags(data.tagsByShopId);
     }
   }, [data, error, loading]);
-  const theme = useTheme();
+
+  React.useEffect(() => {
+    if (initialTags && initialTags.length > 0) {
+      setTagId(initialTags);
+    }
+  }, [initialTags]);
+
   const [allTags, setAllTags] = React.useState<TagType[]>([]);
-  const [tagId, setTagId] = React.useState<number[]>([]);
+  const [tagId, setTagId] = React.useState<number[]>(initialTags ?? []);
 
   const handleChange = (event: SelectChangeEvent<typeof tagId>) => {
-    console.log("event", event.target.value);
     if (typeof event.target.value !== "string") {
       setTagId(event.target.value);
-      console.log("tagId", tagId);
-
       handleTagChange(event.target.value);
     }
   };
@@ -92,15 +98,6 @@ export default function SecectTags({ handleTagChange }: handleTagChangeProps) {
               <ListItemText primary={name} />
             </MenuItem>
           ))}
-          {/* {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
-            >
-              {name}
-            </MenuItem>
-          ))} */}
         </Select>
       </FormControl>
     </div>
