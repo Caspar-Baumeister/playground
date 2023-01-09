@@ -9,6 +9,8 @@ import Home from "./Routes/Home";
 import Inventory from "./Routes/Inventory";
 import TicketsHome from "./Routes/TicketsHome";
 import CreateTickets from "./Routes/CreateTickets";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const client = new ApolloClient({
   uri: "http://localhost:4000/graphql",
@@ -60,7 +62,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ApolloProvider client={client}>
-      <RouterProvider router={router} />
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <RouterProvider router={router} />
+      </LocalizationProvider>
     </ApolloProvider>
   );
 }

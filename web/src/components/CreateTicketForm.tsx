@@ -1,8 +1,11 @@
 import TextField from "@mui/material/TextField";
+import { DatePicker } from "@mui/x-date-pickers";
+
 import { useFormik } from "formik";
+import { useState } from "react";
 import * as yup from "yup";
 import { createTicketData } from "../Routes/CreateTickets";
-import SecectPos from "./SelectPosition";
+import SecectPos from "./SelectPos";
 
 interface CreateTicketFormPropType {
   data: createTicketData;
@@ -10,6 +13,8 @@ interface CreateTicketFormPropType {
 }
 
 export default function CreateTicketForm(props: CreateTicketFormPropType) {
+  const [selectedDate, handleDateChange] = useState(new Date());
+
   const validationSchema = yup.object({
     name: yup.string().required("Ein Produktname wird benötigt"),
     amount: yup.number().required("Eine Mengenangabe wird benötigt"),
@@ -46,13 +51,20 @@ export default function CreateTicketForm(props: CreateTicketFormPropType) {
           }}
           initialPos={undefined}
         />
+        <DatePicker
+          onChange={() => console.log("onchange clicked")}
+          label="Basic example"
+          value={selectedDate}
+          renderInput={(props) => <TextField {...props} />}
+        />
         <TextField
+          multiline
           margin="dense"
           fullWidth
           id="startComment"
           name="startComment"
           label={"Kommentar"}
-          type="number"
+          type="text"
           value={formik.values.startComment}
           onChange={formik.handleChange}
           error={

@@ -1,16 +1,12 @@
-import * as React from "react";
-import { Theme, useTheme } from "@mui/material/styles";
+import { useQuery } from "@apollo/client";
 import Box from "@mui/material/Box";
-import OutlinedInput from "@mui/material/OutlinedInput";
+import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Chip from "@mui/material/Chip";
-import { Checkbox, ListItemText } from "@mui/material";
-import { useQuery } from "@apollo/client";
-import { ShopContext } from "../utiles/ShopContext";
+import * as React from "react";
 import POS_BY_SHOP_ID from "../graphql/queries/pos";
+import { ShopContext } from "../utiles/ShopContext";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -23,20 +19,20 @@ const MenuProps = {
   },
 };
 
-interface handlePosChangeProps {
-  handlePosChange: (pos: number | undefined) => any;
-  initialPos: number | undefined;
+interface handleUserChangeProps {
+  handleUserChange: (User: number | undefined) => any;
+  initialUser: number | undefined;
 }
 
-export type PosType = {
+export type UserType = {
   name: string;
   id: number;
 };
 
-export default function SecectPos({
-  handlePosChange,
-  initialPos,
-}: handlePosChangeProps) {
+export default function SecectUser({
+  handleUserChange,
+  initialUser,
+}: handleUserChangeProps) {
   const shopState = React.useContext(ShopContext);
 
   const { loading, error, data } = useQuery(POS_BY_SHOP_ID, {
@@ -45,23 +41,24 @@ export default function SecectPos({
 
   React.useEffect(() => {
     if (!error && !loading) {
-      setAllPos(data.posByShopId);
+      setAllUser(data.UserByShopId);
     }
   }, [data, error, loading]);
 
   React.useEffect(() => {
-    if (initialPos && initialPos) {
-      setPosId(initialPos);
+    if (initialUser && initialUser) {
+      setUserId(initialUser);
     }
-  }, [initialPos]);
+  }, [initialUser]);
 
-  const [allPos, setAllPos] = React.useState<PosType[]>([]);
-  const [posId, setPosId] = React.useState<number | undefined>(initialPos);
+  const [allUser, setAllUser] = React.useState<UserType[]>([]);
+  const [UserId, setUserId] = React.useState<number | undefined>(initialUser);
 
-  const handleChange = (event: SelectChangeEvent<typeof posId>) => {
+  const handleChange = (event: SelectChangeEvent<typeof UserId>) => {
+    console.log("event", event);
     if (typeof event.target.value !== "string") {
-      setPosId(event.target.value);
-      handlePosChange(event.target.value);
+      setUserId(event.target.value);
+      handleUserChange(event.target.value);
     }
   };
 
@@ -73,23 +70,27 @@ export default function SecectPos({
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Verkaufsort</InputLabel>
         <Select
+          label="Verkaufsort"
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={posId}
-          renderValue={(posId) => {
-            const selectedPos = allPos.find((pos) => pos.id === posId);
-            console.log("selectedPos", selectedPos);
+          value={UserId}
+          native={false}
+          renderValue={(UserId) => {
+            const selectedUser = allUser.find((User) => User.id === UserId);
+            console.log("selectedUser", selectedUser);
+
             return (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selectedPos ? selectedPos.name : ""}
+                {selectedUser ? selectedUser.name : ""}
               </Box>
             );
           }}
-          label="Age"
           onChange={handleChange}
         >
-          {allPos.map((tag) => (
-            <MenuItem key={tag.id}>{tag.name}</MenuItem>
+          {allUser.map((tag) => (
+            <MenuItem value={tag.id} key={tag.id}>
+              {tag.name}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
@@ -99,7 +100,7 @@ export default function SecectPos({
           labelId="select-tags-label"
           id="select-tags"
           multiple
-          value={posId}
+          value={UserId}
           onChange={handleChange}
           input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
           renderValue={(selectedIds) => (
@@ -115,7 +116,7 @@ export default function SecectPos({
         >
           {allTags.map(({ id, name }) => (
             <MenuItem key={id} value={id}>
-              <Checkbox checked={posId.indexOf(id) > -1} />
+              <Checkbox checked={UserId.indexOf(id) > -1} />
               <ListItemText primary={name} />
             </MenuItem>
           ))}
