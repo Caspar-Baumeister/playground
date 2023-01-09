@@ -7,6 +7,8 @@ import Register from "./Routes/Register";
 import IsAuthenticated from "./Components/IsAuthenticated";
 import Home from "./Routes/Home";
 import Inventory from "./Routes/Inventory";
+import TicketsHome from "./Routes/TicketsHome";
+import CreateTickets from "./Routes/CreateTickets";
 
 const client = new ApolloClient({
   uri: "http://localhost:4000/graphql",
@@ -32,11 +34,15 @@ const router = createBrowserRouter([
       },
       {
         path: "/tickets",
-        element: <div>employees</div>,
+        element: <TicketsHome />,
       },
       {
         path: "/",
         element: <Users />,
+      },
+      {
+        path: "/create-tickets",
+        element: <CreateTickets />,
       },
     ],
   },

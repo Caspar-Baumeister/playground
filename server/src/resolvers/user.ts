@@ -221,6 +221,7 @@ export class UserResolver {
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const user = await User.findOneBy({ email: email });
+    console.log("inside login", user);
     if (!user) {
       return {
         errors: [
@@ -244,6 +245,7 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
+    console.log("userpassword is valid", req.session.userId);
     return { user: user };
   }
 

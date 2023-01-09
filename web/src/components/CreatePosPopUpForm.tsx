@@ -10,43 +10,40 @@ import TextField from "@mui/material/TextField";
 import { useFormik } from "formik";
 import * as React from "react";
 import * as yup from "yup";
-import CREATE_TAG from "../graphql/mutations/tag";
-import TAGS_BY_SHOP_ID from "../graphql/queries/tagsByShopId";
+import CREATE_POINT_OF_SELL from "../graphql/mutations/pos";
 import { ShopContext } from "../utiles/ShopContext";
 
-export default function CreateTagPopUpForm() {
+export default function CreatePosPopUpForm() {
   const shopState = React.useContext(ShopContext);
 
   // create tag mutation
-  const [saveTag, { error, data }] = useMutation(CREATE_TAG, {
-    refetchQueries: [
-      { query: TAGS_BY_SHOP_ID, variables: { shopId: shopState?.shop?.id } }, // DocumentNode object parsed with gql
-    ],
+  const [savePos, { error, data }] = useMutation(CREATE_POINT_OF_SELL, {
+    // refetchQueries: [
+    //   { query: POS_BY_SHOP_ID, variables: { shopId: shopState?.shop?.id } }, // DocumentNode object parsed with gql
+    // ],
   });
 
   const [open, handleChange] = React.useState(false);
 
   const validationSchema = yup.object({
-    name: yup.string().required("Ein Produktname wird benötigt"),
+    name: yup.string().required("Ein Name wird benötigt"),
   });
 
   interface valuesTypes {
     name: string;
-    description: string | undefined;
     shopId: number | undefined;
   }
 
   const initialValues: valuesTypes = {
     name: "",
-    description: "",
     shopId: shopState?.shop?.id,
   };
 
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
-      const response = await saveTag({ variables: values });
+    onSubmit: async (values: valuesTypes) => {
+      const response = await savePos({ variables: values });
     },
   });
 
@@ -61,19 +58,18 @@ export default function CreateTagPopUpForm() {
         variant="contained"
         startIcon={<AddIcon />}
       >
-        Tag
+        Position
       </Button>
       {/* <IconButton onClick={() => handleChange(true)} color="default">
         <AddIcon />
       </IconButton> */}
       <Dialog open={open} onClose={() => handleChange(false)}>
-        <DialogTitle>Neuer Tag</DialogTitle>
+        <DialogTitle>Neue Position</DialogTitle>
 
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
             <DialogContentText>
-              Erstelle einen Neuen Tag den du als Produkt beschreibung benutzen
-              kannst.
+              Erstelle eine neue Position an der verkauft wird
             </DialogContentText>
 
             <TextField
@@ -88,21 +84,6 @@ export default function CreateTagPopUpForm() {
               helperText={formik.touched.name && formik.errors.name}
             />
 
-            <TextField
-              multiline
-              margin="dense"
-              fullWidth
-              id="description"
-              name="description"
-              label={"Beschreibung des Tags"}
-              type="number"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              helperText={
-                formik.touched.description && formik.errors.description
-              }
-            />
-
             {error ? (
               <span style={{ color: "green" }}>
                 <DialogContentText>
@@ -110,11 +91,12 @@ export default function CreateTagPopUpForm() {
                 </DialogContentText>
               </span>
             ) : null}
-            {data && data.createTag ? (
+            {data && data.createPointOfSell ? (
               <DialogContentText p={3}>
                 <span style={{ color: "green" }}>
                   {" "}
-                  Der Tag {data.createTag.name} wurde erfolgreich erstellt!
+                  Die Position {data.createPointOfSell.name} wurde erfolgreich
+                  erstellt!
                 </span>
               </DialogContentText>
             ) : null}

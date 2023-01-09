@@ -9,12 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EventUser = void 0;
+exports.TicketProduct = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Event_1 = require("./Event");
-const User_1 = require("./User");
-let EventUser = class EventUser extends typeorm_1.BaseEntity {
+const Product_1 = require("./Product");
+const Ticket_1 = require("./Ticket");
+let TicketProduct = class TicketProduct extends typeorm_1.BaseEntity {
     constructor() {
         super(...arguments);
         this.updatedAt = new Date();
@@ -24,55 +24,47 @@ __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryColumn)(),
     __metadata("design:type", Number)
-], EventUser.prototype, "UserId", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => User_1.User),
-    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.eventUsers),
-    __metadata("design:type", User_1.User)
-], EventUser.prototype, "user", void 0);
+], TicketProduct.prototype, "ticketId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryColumn)(),
     __metadata("design:type", Number)
-], EventUser.prototype, "EventId", void 0);
+], TicketProduct.prototype, "productId", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => Event_1.Event),
-    (0, typeorm_1.ManyToOne)(() => Event_1.Event, (event) => event.eventUsers),
-    __metadata("design:type", Event_1.Event)
-], EventUser.prototype, "event", void 0);
+    (0, type_graphql_1.Field)(() => Product_1.Product),
+    (0, typeorm_1.ManyToOne)(() => Product_1.Product, (product) => product.ticketProducts),
+    (0, typeorm_1.JoinColumn)({ name: "productId" }),
+    __metadata("design:type", Product_1.Product)
+], TicketProduct.prototype, "product", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], EventUser.prototype, "name", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(() => String),
-    __metadata("design:type", String)
-], EventUser.prototype, "location", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(() => Boolean),
-    __metadata("design:type", Boolean)
-], EventUser.prototype, "canEdit", void 0);
+    (0, type_graphql_1.Field)(() => Ticket_1.Ticket),
+    (0, typeorm_1.ManyToOne)(() => Ticket_1.Ticket, (ticket) => ticket.ticketProducts),
+    (0, typeorm_1.JoinColumn)({ name: "ticketId" }),
+    __metadata("design:type", Ticket_1.Ticket)
+], TicketProduct.prototype, "ticket", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], EventUser.prototype, "shopId", void 0);
+], TicketProduct.prototype, "startAmount", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], TicketProduct.prototype, "endAmount", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], EventUser.prototype, "createdAt", void 0);
+], TicketProduct.prototype, "createdAt", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
-], EventUser.prototype, "updatedAt", void 0);
-EventUser = __decorate([
+], TicketProduct.prototype, "updatedAt", void 0);
+TicketProduct = __decorate([
     (0, type_graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)()
-], EventUser);
-exports.EventUser = EventUser;
-//# sourceMappingURL=EventUser.js.map
+], TicketProduct);
+exports.TicketProduct = TicketProduct;
+//# sourceMappingURL=TicketProduct.js.map

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Shop = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Event_1 = require("./Event");
+const Ticket_1 = require("./Ticket");
 const Product_1 = require("./Product");
 const ShopUser_1 = require("./ShopUser");
 const Tag_1 = require("./Tag");
@@ -54,10 +54,10 @@ __decorate([
     __metadata("design:type", Array)
 ], Shop.prototype, "tags", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [Event_1.Event], { nullable: true }),
-    (0, typeorm_1.OneToMany)(() => Event_1.Event, (event) => event.shop),
+    (0, type_graphql_1.Field)(() => [Ticket_1.Ticket], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => Ticket_1.Ticket, (ticket) => ticket.shopId),
     __metadata("design:type", Array)
-], Shop.prototype, "events", void 0);
+], Shop.prototype, "tickets", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => [ShopUser_1.ShopUser], { nullable: true }),
     (0, typeorm_1.OneToMany)(() => ShopUser_1.ShopUser, (shopUser) => shopUser.shop),

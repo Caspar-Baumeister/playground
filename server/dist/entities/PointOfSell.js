@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PointOfSell = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Shop_1 = require("./Shop");
+const Ticket_1 = require("./Ticket");
 let PointOfSell = class PointOfSell extends typeorm_1.BaseEntity {
     constructor() {
         super(...arguments);
@@ -32,27 +32,12 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], PointOfSell.prototype, "location", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], PointOfSell.prototype, "usualStartDate", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], PointOfSell.prototype, "usualEndDate", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], PointOfSell.prototype, "shopId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.products),
-    __metadata("design:type", Shop_1.Shop)
-], PointOfSell.prototype, "shop", void 0);
+    (0, typeorm_1.OneToMany)(() => Ticket_1.Ticket, (ticket) => ticket.pos),
+    __metadata("design:type", Array)
+], PointOfSell.prototype, "tickets", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.CreateDateColumn)(),

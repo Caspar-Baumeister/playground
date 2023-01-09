@@ -7,10 +7,12 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Shop } from "./Shop";
+import { TicketProduct } from "./TicketProduct";
 import { Tag } from "./Tag";
 
 @ObjectType()
@@ -42,6 +44,10 @@ export class Product extends BaseEntity {
 
   @ManyToOne(() => Shop, (shop) => shop.products)
   shop: Shop;
+
+  @Field(() => [TicketProduct], { nullable: true })
+  @OneToMany(() => TicketProduct, (sp) => sp.product)
+  ticketProducts: TicketProduct[];
 
   @Field(() => [Tag], { nullable: true })
   @ManyToMany(() => Tag, (tag) => tag.products)

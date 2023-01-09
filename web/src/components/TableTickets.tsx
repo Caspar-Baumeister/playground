@@ -1,13 +1,13 @@
 import { useMutation, useQuery } from "@apollo/client";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
-import { alpha, Grid } from "@mui/material";
+import { alpha, Button, Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
+import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import Table from "@mui/material/Table";
@@ -20,41 +20,50 @@ import TableRow from "@mui/material/TableRow";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
-import PRODUCTS_BY_SHOP_ID from "../graphql/queries/product";
+import { useNavigate } from "react-router-dom";
+import { DELETE_PRODUCT } from "../graphql/mutations/product";
+import { TICKETS_BY_SHOP_ID } from "../graphql/queries/ticket";
 import { ShopContext } from "../utiles/ShopContext";
+import CreatePosPopUpForm from "./CreatePosPopUpForm";
 import CreateProductPopUpForm from "./CreateProductPopUpForm";
 import CreateTagPopUpForm from "./CreateTagPopUpForm";
-import { DELETE_PRODUCT } from "../graphql/mutations/product";
-import { UpdateProductPopUpForm } from "./UpdateProductPopUpForm copy";
+import { TicketDetailsPopUp } from "./TicketDetailsPopUp";
 
-export interface TagsData {
+export interface PosData {
+  id: number;
+  name: string;
+}
+
+export interface ResponsibleUserData {
   id: number;
   name: string;
 }
 
 interface DisplayData {
   id: number;
-  name: string;
-  amountKg: number | null;
-  amountStk: number | null;
-  price: number;
-  totalValue: number;
+  namePos: string;
+  nameResponsibleUser: string;
+  status: number;
+  date: string;
   updatedAt: string;
 }
 
-export interface ProductData {
-  name: string;
+export interface TicketData {
+  pos: PosData;
   id: number;
   shopId: number;
-  amount: number;
-  amountType: number;
-  price: number;
   updatedAt: string;
-  tags: TagsData;
+  date: string;
+  responsibleUser: ResponsibleUserData;
+  status: number;
+  startMoney: number;
+  endMoney: number | null;
+  startComment: string | null;
+  endComment: string | null;
 }
 
 interface Column {
-  id: "name" | "amountKg" | "amountStk" | "price" | "id" | "totalValue";
+  id: "namePos" | "nameResponsibleUser" | "date" | "status" | "id";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -62,52 +71,25 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: "name", label: "Name", minWidth: 50 },
+  { id: "namePos", label: "Ort", minWidth: 50 },
   {
-    id: "amountKg",
-    label: "Menge (kg)",
+    id: "nameResponsibleUser",
+    label: "Verantwortlicher",
     minWidth: 15,
-    align: "right",
-    format: (value: number) =>
-      value.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
   },
   {
-    id: "amountStk",
-    label: "Menge (Stk)",
+    id: "date",
+    label: "Datum",
     minWidth: 15,
-    align: "right",
-    format: (value: number) =>
-      value.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
   },
   {
-    id: "price",
-    label: "Price (€/100g | €/Stk)",
+    id: "status",
+    label: "Status",
     minWidth: 15,
     align: "right",
-    format: (value: number) =>
-      value.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
+    format: (value: number) => value.toLocaleString("de-DE"),
   },
 
-  {
-    id: "totalValue",
-    label: "Gesammtwert (€)",
-    minWidth: 15,
-    align: "right",
-    format: (value: number) =>
-      value.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
-  },
   {
     id: "id",
     label: "",
@@ -158,6 +140,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function EnhancedTableToolbar() {
+  const navigate = useNavigate();
   return (
     <Toolbar
       sx={{
@@ -188,16 +171,23 @@ function EnhancedTableToolbar() {
         </Grid>
       }
       {
-        <Box width={300}>
+        <Box width={400}>
           <Grid container style={{ gap: 20 }}>
             <Grid>
               <Tooltip title="Filter list">
-                <CreateProductPopUpForm />
+                <Button
+                  onClick={() => navigate("/create-tickets")}
+                  sx={{ borderRadius: 10 }}
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                >
+                  Tickets
+                </Button>
               </Tooltip>
             </Grid>
             <Grid>
               <Tooltip title="Filter list">
-                <CreateTagPopUpForm />
+                <CreatePosPopUpForm />
               </Tooltip>
             </Grid>
           </Grid>
@@ -207,14 +197,14 @@ function EnhancedTableToolbar() {
   );
 }
 
-export default function EnhancedTable() {
+export default function TicketsTable() {
   const shopState = React.useContext(ShopContext);
 
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const { loading, error, data } = useQuery(PRODUCTS_BY_SHOP_ID, {
+  const { loading, error, data } = useQuery(TICKETS_BY_SHOP_ID, {
     variables: { shopId: shopState?.shop?.id },
   });
 
@@ -224,7 +214,7 @@ export default function EnhancedTable() {
   ] = useMutation(DELETE_PRODUCT, {
     refetchQueries: [
       {
-        query: PRODUCTS_BY_SHOP_ID,
+        query: TICKETS_BY_SHOP_ID,
         variables: { shopId: shopState?.shop?.id },
       },
     ],
@@ -248,17 +238,16 @@ export default function EnhancedTable() {
     setDense(event.target.checked);
   };
 
-  const rawData: ProductData[] = data.productsByShopId;
+  const rawData: TicketData[] = data.ticketsByShopId;
+  console.log("data:", data);
+  console.log("rawData:", rawData);
 
   const rows: DisplayData[] = rawData.map((_data) => ({
     id: _data.id,
-    name: _data.name,
-    amountKg: _data.amountType ? _data.amount : null,
-    amountStk: _data.amountType ? null : _data.amount,
-    price: _data.price,
-    totalValue: _data.amountType
-      ? _data.amount * 10 * _data.price
-      : _data.amount * _data.price,
+    namePos: _data.pos.name,
+    nameResponsibleUser: _data.responsibleUser.name,
+    date: _data.date,
+    status: _data.status,
     updatedAt: _data.updatedAt,
   }));
   return (
@@ -293,29 +282,24 @@ export default function EnhancedTable() {
                       {columns.map((column) => {
                         const value = row[column.id];
                         const item = row;
+
                         if (column.id === "id") {
+                          const rawTicket = rawData.find(
+                            (ticket) => ticket.id === value
+                          );
                           return (
                             <TableCell
                               key={column.id}
                               align={column.align}
                               height={1}
                             >
-                              <Grid>
-                                <UpdateProductPopUpForm
-                                  productId={value as number}
-                                />
-                                <IconButton
-                                  size="small"
-                                  color="warning"
-                                  onClick={() =>
-                                    deleteProduct({
-                                      variables: { id: value as number },
-                                    })
-                                  }
-                                >
-                                  <DeleteIcon sx={{ fontSize: "18px" }} />
-                                </IconButton>
-                              </Grid>
+                              {rawTicket ? (
+                                <Grid>
+                                  <TicketDetailsPopUp ticket={rawTicket} />
+                                </Grid>
+                              ) : (
+                                <Box />
+                              )}
                             </TableCell>
                           );
                         }

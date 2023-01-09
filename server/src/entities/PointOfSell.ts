@@ -4,11 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Shop } from "./Shop";
+import { Ticket } from "./Ticket";
 
 @ObjectType()
 @Entity()
@@ -23,22 +23,10 @@ export class PointOfSell extends BaseEntity {
 
   @Field()
   @Column()
-  location!: string;
-
-  @Field()
-  @Column()
-  usualStartDate!: string;
-
-  @Field()
-  @Column()
-  usualEndDate!: string;
-
-  @Field()
-  @Column()
   shopId!: number;
 
-  @ManyToOne(() => Shop, (shop) => shop.products)
-  shop: Shop;
+  @OneToMany(() => Ticket, (ticket) => ticket.pos)
+  tickets: Ticket[];
 
   @Field(() => String)
   @CreateDateColumn()

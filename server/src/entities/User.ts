@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { EventUser } from "./EventUser";
+import { Ticket } from "./Ticket";
 import { Shop } from "./Shop";
 import { ShopUser } from "./ShopUser";
 
@@ -42,8 +42,9 @@ export class User extends BaseEntity {
   @CreateDateColumn({ type: "date" })
   createdAt?: Date;
 
-  @OneToMany(() => EventUser, (eventUser) => eventUser.user)
-  eventUsers: EventUser[];
+  @Field(() => [Ticket], { nullable: true })
+  @OneToMany(() => Ticket, (ticket) => ticket.responsibleUser)
+  tickets: Ticket[];
 
   @Field(() => String)
   @UpdateDateColumn()

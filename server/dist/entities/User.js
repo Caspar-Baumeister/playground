@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const EventUser_1 = require("./EventUser");
+const Ticket_1 = require("./Ticket");
 const Shop_1 = require("./Shop");
 const ShopUser_1 = require("./ShopUser");
 let User = class User extends typeorm_1.BaseEntity {
@@ -52,9 +52,10 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => EventUser_1.EventUser, (eventUser) => eventUser.user),
+    (0, type_graphql_1.Field)(() => [Ticket_1.Ticket], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => Ticket_1.Ticket, (ticket) => ticket.responsibleUser),
     __metadata("design:type", Array)
-], User.prototype, "eventUsers", void 0);
+], User.prototype, "tickets", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.UpdateDateColumn)(),

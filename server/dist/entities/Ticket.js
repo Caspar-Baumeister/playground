@@ -9,76 +9,92 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Product = void 0;
+exports.Ticket = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Shop_1 = require("./Shop");
+const PointOfSell_1 = require("./PointOfSell");
 const TicketProduct_1 = require("./TicketProduct");
-const Tag_1 = require("./Tag");
-let Product = class Product extends typeorm_1.BaseEntity {
-    constructor() {
-        super(...arguments);
-        this.updatedAt = new Date();
-    }
+const User_1 = require("./User");
+let Ticket = class Ticket extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Product.prototype, "id", void 0);
+], Ticket.prototype, "id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Product.prototype, "name", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)({ type: "decimal" }),
-    __metadata("design:type", Number)
-], Product.prototype, "price", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)({ type: "decimal" }),
-    __metadata("design:type", Number)
-], Product.prototype, "amount", void 0);
+], Ticket.prototype, "date", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Product.prototype, "amountType", void 0);
+], Ticket.prototype, "responsibleUserId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Product.prototype, "shopId", void 0);
+], Ticket.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.products),
-    __metadata("design:type", Shop_1.Shop)
-], Product.prototype, "shop", void 0);
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)({ type: "decimal" }),
+    __metadata("design:type", Number)
+], Ticket.prototype, "startMoney", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: "decimal", nullable: true }),
+    __metadata("design:type", Number)
+], Ticket.prototype, "endMoney", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Ticket.prototype, "startComment", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Ticket.prototype, "endComment", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Ticket.prototype, "posId", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Ticket.prototype, "shopId", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.tickets),
+    __metadata("design:type", User_1.User)
+], Ticket.prototype, "responsibleUser", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.ManyToOne)(() => PointOfSell_1.PointOfSell, (pos) => pos.tickets),
+    __metadata("design:type", PointOfSell_1.PointOfSell)
+], Ticket.prototype, "pos", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => [TicketProduct_1.TicketProduct], { nullable: true }),
-    (0, typeorm_1.OneToMany)(() => TicketProduct_1.TicketProduct, (sp) => sp.product),
+    (0, typeorm_1.OneToMany)(() => TicketProduct_1.TicketProduct, (sp) => sp.product, { nullable: true }),
     __metadata("design:type", Array)
-], Product.prototype, "ticketProducts", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => [Tag_1.Tag], { nullable: true }),
-    (0, typeorm_1.ManyToMany)(() => Tag_1.Tag, (tag) => tag.products),
-    (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", Array)
-], Product.prototype, "tags", void 0);
+], Ticket.prototype, "ticketProducts", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ type: "date" }),
     __metadata("design:type", Date)
-], Product.prototype, "createdAt", void 0);
+], Ticket.prototype, "createdAt", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
-], Product.prototype, "updatedAt", void 0);
-Product = __decorate([
+], Ticket.prototype, "updatedAt", void 0);
+Ticket = __decorate([
     (0, type_graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)()
-], Product);
-exports.Product = Product;
-//# sourceMappingURL=Product.js.map
+], Ticket);
+exports.Ticket = Ticket;
+//# sourceMappingURL=Ticket.js.map

@@ -8,8 +8,7 @@ import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { DataSource } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import { Event } from "./entities/Event";
-import { EventUser } from "./entities/EventUser";
+import { Ticket } from "./entities/Ticket";
 import { PointOfSell } from "./entities/PointOfSell";
 import { Product } from "./entities/Product";
 import { Shop } from "./entities/Shop";
@@ -21,6 +20,9 @@ import { ShopResolver } from "./resolvers/shop";
 import { TagResolver } from "./resolvers/tag";
 import { UserResolver } from "./resolvers/user";
 import { MyContext } from "./types";
+import { TicketProduct } from "./entities/TicketProduct";
+import { PosResolver } from "./resolvers/pos";
+import { TicketResolver } from "./resolvers/ticket";
 
 export const dataSource = new DataSource({
   type: "postgres",
@@ -29,7 +31,16 @@ export const dataSource = new DataSource({
   password: "C4sp4R123",
   logging: true,
   synchronize: true,
-  entities: [Product, User, Shop, Event, EventUser, PointOfSell, Tag, ShopUser],
+  entities: [
+    Product,
+    User,
+    Shop,
+    Ticket,
+    PointOfSell,
+    Tag,
+    ShopUser,
+    TicketProduct,
+  ],
 });
 
 const main = async () => {
@@ -76,7 +87,14 @@ const main = async () => {
   //
   const appoloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [ProductResolver, UserResolver, ShopResolver, TagResolver],
+      resolvers: [
+        ProductResolver,
+        UserResolver,
+        ShopResolver,
+        TagResolver,
+        PosResolver,
+        TicketResolver,
+      ],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({ req, res, redis }),

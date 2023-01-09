@@ -175,6 +175,7 @@ let UserResolver = class UserResolver {
     }
     async login(email, password, { req }) {
         const user = await User_1.User.findOneBy({ email: email });
+        console.log("inside login", user);
         if (!user) {
             return {
                 errors: [
@@ -197,6 +198,7 @@ let UserResolver = class UserResolver {
             };
         }
         req.session.userId = user.id;
+        console.log("userpassword is valid", req.session.userId);
         return { user: user };
     }
     logout({ req, res }) {

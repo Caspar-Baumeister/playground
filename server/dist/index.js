@@ -14,8 +14,7 @@ require("reflect-metadata");
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const constants_1 = require("./constants");
-const Event_1 = require("./entities/Event");
-const EventUser_1 = require("./entities/EventUser");
+const Ticket_1 = require("./entities/Ticket");
 const PointOfSell_1 = require("./entities/PointOfSell");
 const Product_1 = require("./entities/Product");
 const Shop_1 = require("./entities/Shop");
@@ -26,6 +25,9 @@ const product_1 = require("./resolvers/product");
 const shop_1 = require("./resolvers/shop");
 const tag_1 = require("./resolvers/tag");
 const user_1 = require("./resolvers/user");
+const TicketProduct_1 = require("./entities/TicketProduct");
+const pos_1 = require("./resolvers/pos");
+const ticket_1 = require("./resolvers/ticket");
 exports.dataSource = new typeorm_1.DataSource({
     type: "postgres",
     database: "playground",
@@ -33,7 +35,16 @@ exports.dataSource = new typeorm_1.DataSource({
     password: "C4sp4R123",
     logging: true,
     synchronize: true,
-    entities: [Product_1.Product, User_1.User, Shop_1.Shop, Event_1.Event, EventUser_1.EventUser, PointOfSell_1.PointOfSell, Tag_1.Tag, ShopUser_1.ShopUser],
+    entities: [
+        Product_1.Product,
+        User_1.User,
+        Shop_1.Shop,
+        Ticket_1.Ticket,
+        PointOfSell_1.PointOfSell,
+        Tag_1.Tag,
+        ShopUser_1.ShopUser,
+        TicketProduct_1.TicketProduct,
+    ],
 });
 const main = async () => {
     await exports.dataSource.initialize();
@@ -59,7 +70,14 @@ const main = async () => {
     }));
     const appoloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [product_1.ProductResolver, user_1.UserResolver, shop_1.ShopResolver, tag_1.TagResolver],
+            resolvers: [
+                product_1.ProductResolver,
+                user_1.UserResolver,
+                shop_1.ShopResolver,
+                tag_1.TagResolver,
+                pos_1.PosResolver,
+                ticket_1.TicketResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res, redis }),

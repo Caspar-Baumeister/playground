@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Event } from "./Event";
+import { Ticket } from "./Ticket";
 import { Product } from "./Product";
 import { ShopUser } from "./ShopUser";
 import { Tag } from "./Tag";
@@ -42,9 +42,9 @@ export class Shop extends BaseEntity {
   @OneToMany(() => Tag, (tag) => tag.shop)
   tags: Tag[];
 
-  @Field(() => [Event], { nullable: true })
-  @OneToMany(() => Event, (event) => event.shop)
-  events: Event[];
+  @Field(() => [Ticket], { nullable: true })
+  @OneToMany(() => Ticket, (ticket) => ticket.shopId)
+  tickets: Ticket[];
 
   @Field(() => [ShopUser], { nullable: true })
   @OneToMany(() => ShopUser, (shopUser) => shopUser.shop)
