@@ -8,19 +8,8 @@ import * as React from "react";
 import POS_BY_SHOP_ID from "../graphql/queries/pos";
 import { ShopContext } from "../utiles/ShopContext";
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
 interface handlePosChangeProps {
-  handlePosChange: (pos: number | undefined) => any;
+  handlePosChange: (pos: PosType) => any;
   initialPos: number | undefined;
 }
 
@@ -46,7 +35,7 @@ export default function SecectPos({
   }, [data, error, loading]);
 
   React.useEffect(() => {
-    if (initialPos && initialPos) {
+    if (initialPos) {
       setPosId(initialPos);
     }
   }, [initialPos]);
@@ -58,7 +47,10 @@ export default function SecectPos({
     console.log("event", event);
     if (typeof event.target.value !== "string") {
       setPosId(event.target.value);
-      handlePosChange(event.target.value);
+      const selectedPos = allPos.find((pos) => pos.id === event.target.value);
+      if (selectedPos) {
+        handlePosChange(selectedPos);
+      }
     }
   };
 
@@ -77,8 +69,6 @@ export default function SecectPos({
           native={false}
           renderValue={(posId) => {
             const selectedPos = allPos.find((pos) => pos.id === posId);
-            console.log("selectedPos", selectedPos);
-
             return (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selectedPos ? selectedPos.name : ""}
@@ -94,34 +84,6 @@ export default function SecectPos({
           ))}
         </Select>
       </FormControl>
-      {/* <FormControl style={{ minWidth: 150, marginTop: 8 }}>
-        <InputLabel id="select-tags-label">Tags</InputLabel>
-        <Select
-          labelId="select-tags-label"
-          id="select-tags"
-          multiple
-          value={posId}
-          onChange={handleChange}
-          input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-          renderValue={(selectedIds) => (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {allTags
-                .filter((tag) => selectedIds.indexOf(tag.id) > -1)
-                .map((tag) => (
-                  <Chip key={tag.id} label={tag.name} />
-                ))}
-            </Box>
-          )}
-          MenuProps={MenuProps}
-        >
-          {allTags.map(({ id, name }) => (
-            <MenuItem key={id} value={id}>
-              <Checkbox checked={posId.indexOf(id) > -1} />
-              <ListItemText primary={name} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl> */}
     </div>
   );
 }

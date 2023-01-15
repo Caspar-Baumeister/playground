@@ -16,12 +16,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
-const User_1 = require("../entities/User");
-const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
-const constants_1 = require("../constants");
-const sendEmail_1 = require("../utiles/sendEmail");
+const type_graphql_1 = require("type-graphql");
 const uuid_1 = require("uuid");
+const __1 = require("..");
+const constants_1 = require("../constants");
+const User_1 = require("../entities/User");
+const sendEmail_1 = require("../utiles/sendEmail");
 let FieldError = class FieldError {
 };
 __decorate([
@@ -51,6 +52,14 @@ UserResponse = __decorate([
 let UserResolver = class UserResolver {
     users() {
         return User_1.User.find();
+    }
+    usersWithShops() {
+        return (__1.dataSource
+            .getRepository(User_1.User)
+            .createQueryBuilder("user")
+            .leftJoinAndSelect("user.shopUsers", "su")
+            .leftJoinAndSelect("su.shop", "shop")
+            .getMany());
     }
     async me({ req }) {
         if (!req.session.userId) {
@@ -221,6 +230,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "users", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => [User_1.User]),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "usersWithShops", null);
 __decorate([
     (0, type_graphql_1.Query)(() => User_1.User, { nullable: true }),
     __param(0, (0, type_graphql_1.Ctx)()),

@@ -1,6 +1,6 @@
 import React from "react";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import Users from "./Components/Users";
+import Users from "./Routes/Users";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./Routes/Login";
 import Register from "./Routes/Register";

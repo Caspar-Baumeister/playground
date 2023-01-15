@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
@@ -23,7 +24,10 @@ export class ShopUser extends BaseEntity {
   userId!: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.shopUsers)
+  @ManyToOne(() => User, (user) => user.shopUsers, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "userId" })
   user: User;
 
   @Field()
@@ -31,7 +35,10 @@ export class ShopUser extends BaseEntity {
   shopId!: number;
 
   @Field(() => Shop)
-  @ManyToOne(() => Shop, (shop) => shop.users)
+  @ManyToOne(() => Shop, (shop) => shop.users, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "shopId" })
   shop: Shop;
 
   @Field()

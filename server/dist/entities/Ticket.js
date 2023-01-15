@@ -23,9 +23,9 @@ __decorate([
     __metadata("design:type", Number)
 ], Ticket.prototype, "id", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
+    (0, type_graphql_1.Field)(() => String),
+    (0, typeorm_1.Column)({ type: "date" }),
+    __metadata("design:type", Date)
 ], Ticket.prototype, "date", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),

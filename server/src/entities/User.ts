@@ -30,11 +30,11 @@ export class User extends BaseEntity {
   @Column({})
   password!: string;
 
-  @Field(() => [Shop], { nullable: true })
+  @Field(() => [Shop])
   @OneToMany(() => Shop, (shop) => shop.creator)
   createdShops: Shop[];
 
-  @Field(() => [ShopUser], { nullable: true })
+  @Field(() => [ShopUser])
   @OneToMany(() => ShopUser, (shopUser) => shopUser.user)
   shopUsers: ShopUser[];
 
@@ -42,7 +42,7 @@ export class User extends BaseEntity {
   @CreateDateColumn({ type: "date" })
   createdAt?: Date;
 
-  @Field(() => [Ticket], { nullable: true })
+  @Field(() => [Ticket])
   @OneToMany(() => Ticket, (ticket) => ticket.responsibleUser)
   tickets: Ticket[];
 

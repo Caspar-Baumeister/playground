@@ -27,7 +27,10 @@ __decorate([
 ], ShopUser.prototype, "userId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => User_1.User),
-    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.shopUsers),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.shopUsers, {
+        onDelete: "CASCADE",
+    }),
+    (0, typeorm_1.JoinColumn)({ name: "userId" }),
     __metadata("design:type", User_1.User)
 ], ShopUser.prototype, "user", void 0);
 __decorate([
@@ -37,7 +40,10 @@ __decorate([
 ], ShopUser.prototype, "shopId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => Shop_1.Shop),
-    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.users),
+    (0, typeorm_1.ManyToOne)(() => Shop_1.Shop, (shop) => shop.users, {
+        onDelete: "CASCADE",
+    }),
+    (0, typeorm_1.JoinColumn)({ name: "shopId" }),
     __metadata("design:type", Shop_1.Shop)
 ], ShopUser.prototype, "shop", void 0);
 __decorate([

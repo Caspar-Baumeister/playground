@@ -22,7 +22,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { mainListItems } from "../Components/Dashboard/listItems";
-import MY_SHOPS from "../graphql/queries/myShops";
+import { MY_SHOPS } from "../graphql/queries/shop";
 import { ShopContext, ShopType } from "../utiles/ShopContext";
 
 const drawerWidth: number = 240;

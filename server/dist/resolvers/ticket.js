@@ -94,6 +94,15 @@ let TicketResolver = class TicketResolver {
         }
         return true;
     }
+    async deleteAll() {
+        await __1.dataSource
+            .getRepository(Ticket_1.Ticket)
+            .createQueryBuilder("ticket")
+            .delete()
+            .from(Ticket_1.Ticket)
+            .execute();
+        return true;
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [Ticket_1.Ticket]),
@@ -116,7 +125,7 @@ __decorate([
     __param(3, (0, type_graphql_1.Arg)("endMoney", () => type_graphql_1.Float, { nullable: true })),
     __param(4, (0, type_graphql_1.Arg)("shopId")),
     __param(5, (0, type_graphql_1.Arg)("status")),
-    __param(6, (0, type_graphql_1.Arg)("date")),
+    __param(6, (0, type_graphql_1.Arg)("date", () => Date)),
     __param(7, (0, type_graphql_1.Arg)("startComment", { nullable: true })),
     __param(8, (0, type_graphql_1.Arg)("endComment", { nullable: true })),
     __param(9, (0, type_graphql_1.Arg)("productIds", () => [type_graphql_1.ID])),
@@ -156,6 +165,12 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], TicketResolver.prototype, "deleteTicket", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TicketResolver.prototype, "deleteAll", null);
 TicketResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], TicketResolver);

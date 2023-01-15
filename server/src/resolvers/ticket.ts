@@ -30,7 +30,7 @@ export class TicketResolver {
     @Arg("endMoney", () => Float, { nullable: true }) endMoney: number,
     @Arg("shopId") shopId: number,
     @Arg("status") status: number,
-    @Arg("date") date: string,
+    @Arg("date", () => Date) date: string,
     @Arg("startComment", { nullable: true }) startComment: string,
     @Arg("endComment", { nullable: true }) endComment: string,
     @Arg("productIds", () => [ID]) productIds: number[],
@@ -122,57 +122,16 @@ export class TicketResolver {
     }
     return true;
   }
+
+  @Mutation(() => Boolean)
+  async deleteAll(): Promise<boolean> {
+    await dataSource
+      .getRepository(Ticket)
+      .createQueryBuilder("ticket")
+      .delete()
+      .from(Ticket)
+      .execute();
+
+    return true;
+  }
 }
-
-//   @Mutation(() => Ticket)
-//   async createTicket(
-//     @Arg("responsibleUserId", () => ID) responsibleUserId: number,
-//     @Arg("posId", () => ID) posId: number,
-//     @Arg("startMoney", () => Float) startMoney: number,
-//     @Arg("endMoney", () => Float, { nullable: true }) endMoney: number,
-//     @Arg("shopId") shopId: number,
-//     @Arg("status") status: number,
-//     @Arg("date") date: string,
-//     @Arg("startComment", { nullable: true }) startComment: string,
-//     @Arg("endComment", { nullable: true }) endComment: string,
-//     @Arg("productIds", () => [ID]) productIds: number[],
-//     @Arg("startAmounts", () => [Float]) startAmounts: number[]
-//   ): Promise<Ticket> {
-//     // create ticket
-//     const ticket = Ticket.create({
-//       responsibleUserId,
-//       date,
-//       endComment,
-//       posId,
-//       startComment,
-//       startMoney,
-//       shopId,
-//       status,
-//       endMoney,
-//     });
-
-//     console.log("ticket safed", ticket);
-
-//     // create productTickets
-//     let ticketProducts: TicketProduct[] = Array(productIds.length);
-//     productIds.forEach(async (value, index) => {
-//       const ticketProduct = TicketProduct.create({
-//         productId: value,
-//         ticket: ticket,
-//         startAmount: startAmounts[index],
-//       });
-//       //   await ticketProduct.save(); //
-//       ticketProducts[index] = ticketProduct;
-
-//       console.log("ticketProducts[index]", ticketProducts[index]);
-//     });
-
-//     console.log("startProducts::", ticketProducts);
-//     // put the product tickets as startProducts for the ticket
-//     ticket.ticketProducts = ticketProducts;
-
-//     console.log("startProducts created", ticket);
-
-//     // save the new ticket and return the response
-//     return ticket.save();
-//   }

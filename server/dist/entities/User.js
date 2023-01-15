@@ -37,12 +37,12 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [Shop_1.Shop], { nullable: true }),
+    (0, type_graphql_1.Field)(() => [Shop_1.Shop]),
     (0, typeorm_1.OneToMany)(() => Shop_1.Shop, (shop) => shop.creator),
     __metadata("design:type", Array)
 ], User.prototype, "createdShops", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [ShopUser_1.ShopUser], { nullable: true }),
+    (0, type_graphql_1.Field)(() => [ShopUser_1.ShopUser]),
     (0, typeorm_1.OneToMany)(() => ShopUser_1.ShopUser, (shopUser) => shopUser.user),
     __metadata("design:type", Array)
 ], User.prototype, "shopUsers", void 0);
@@ -52,7 +52,7 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [Ticket_1.Ticket], { nullable: true }),
+    (0, type_graphql_1.Field)(() => [Ticket_1.Ticket]),
     (0, typeorm_1.OneToMany)(() => Ticket_1.Ticket, (ticket) => ticket.responsibleUser),
     __metadata("design:type", Array)
 ], User.prototype, "tickets", void 0);

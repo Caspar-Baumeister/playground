@@ -32,13 +32,17 @@ __decorate([
 ], TicketProduct.prototype, "productId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => Product_1.Product),
-    (0, typeorm_1.ManyToOne)(() => Product_1.Product, (product) => product.ticketProducts),
+    (0, typeorm_1.ManyToOne)(() => Product_1.Product, (product) => product.ticketProducts, {
+        onDelete: "CASCADE",
+    }),
     (0, typeorm_1.JoinColumn)({ name: "productId" }),
     __metadata("design:type", Product_1.Product)
 ], TicketProduct.prototype, "product", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => Ticket_1.Ticket),
-    (0, typeorm_1.ManyToOne)(() => Ticket_1.Ticket, (ticket) => ticket.ticketProducts),
+    (0, typeorm_1.ManyToOne)(() => Ticket_1.Ticket, (ticket) => ticket.ticketProducts, {
+        onDelete: "CASCADE",
+    }),
     (0, typeorm_1.JoinColumn)({ name: "ticketId" }),
     __metadata("design:type", Ticket_1.Ticket)
 ], TicketProduct.prototype, "ticket", void 0);

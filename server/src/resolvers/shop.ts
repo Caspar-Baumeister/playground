@@ -1,6 +1,7 @@
 import {
   Arg,
   Ctx,
+  ID,
   Mutation,
   Query,
   Resolver,
@@ -13,6 +14,19 @@ import { MyContext } from "../types";
 
 @Resolver()
 export class ShopResolver {
+  // all user of shop
+  @Query(() => Shop)
+  shopWithUsers(@Arg("shopId", () => ID) shopId: number): Promise<Shop | null> {
+    return dataSource
+      .getRepository(Shop)
+      .createQueryBuilder("shop")
+      .where("shop.id = :shopId", { shopId })
+      .leftJoinAndSelect("shop.users", "users")
+      .leftJoinAndSelect("users.user", "user")
+      .leftJoinAndSelect("shop.creator", "creator")
+      .getOne();
+  }
+
   // queries all shops
   @Query(() => [Shop])
   shops(): Promise<Shop[]> {
@@ -47,8 +61,9 @@ export class ShopResolver {
   async createShop(
     @Arg("name") name: string,
     @Ctx() { req }: MyContext
-  ): Promise<Shop> {
-    return Shop.create({ name, creatorId: req.session.userId }).save();
+  ): Promise<Shop | null> {
+    const shop = Shop.create({ name, creatorId: req.session.userId });
+    return shop.save();
   }
 
   @Mutation(() => Shop, { nullable: true })

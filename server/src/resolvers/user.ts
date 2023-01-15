@@ -1,5 +1,4 @@
-import { User } from "../entities/User";
-import { MyContext } from "../types";
+import argon2 from "argon2";
 import {
   Arg,
   Ctx,
@@ -9,28 +8,12 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
-import argon2 from "argon2";
-import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
-import { sendEmail } from "../utiles/sendEmail";
 import { v4 } from "uuid";
-
-// @InputType()
-// class EmailAndPassword {
-//   @Field()
-//   email: string;
-//   @Field()
-//   password: string;
-// }
-
-// @InputType()
-// class NameEmailAndPassword {
-//   @Field()
-//   name: string;
-//   @Field()
-//   email: string;
-//   @Field()
-//   password: string;
-// }
+import { dataSource } from "..";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
+import { User } from "../entities/User";
+import { MyContext } from "../types";
+import { sendEmail } from "../utiles/sendEmail";
 
 @ObjectType()
 class FieldError {
@@ -50,9 +33,24 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  // all users
   @Query(() => [User])
   users(): Promise<User[]> {
     return User.find();
+  }
+
+  // all user of shop
+  @Query(() => [User])
+  usersWithShops(): Promise<User[] | null> {
+    return (
+      dataSource
+        .getRepository(User)
+        .createQueryBuilder("user")
+        // .where(":shopId NOT IN(...user.shopUsers)", { shopId })
+        .leftJoinAndSelect("user.shopUsers", "su")
+        .leftJoinAndSelect("su.shop", "shop")
+        .getMany()
+    );
   }
 
   @Query(() => User, { nullable: true })

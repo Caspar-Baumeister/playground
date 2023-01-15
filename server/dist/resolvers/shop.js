@@ -18,6 +18,16 @@ const __1 = require("..");
 const Shop_1 = require("../entities/Shop");
 const isAuth_1 = require("../middleware/isAuth");
 let ShopResolver = class ShopResolver {
+    shopWithUsers(shopId) {
+        return __1.dataSource
+            .getRepository(Shop_1.Shop)
+            .createQueryBuilder("shop")
+            .where("shop.id = :shopId", { shopId })
+            .leftJoinAndSelect("shop.users", "users")
+            .leftJoinAndSelect("users.user", "user")
+            .leftJoinAndSelect("shop.creator", "creator")
+            .getOne();
+    }
     shops() {
         return __1.dataSource
             .getRepository(Shop_1.Shop)
@@ -38,7 +48,8 @@ let ShopResolver = class ShopResolver {
         return Shop_1.Shop.findOneBy({ id });
     }
     async createShop(name, { req }) {
-        return Shop_1.Shop.create({ name, creatorId: req.session.userId }).save();
+        const shop = Shop_1.Shop.create({ name, creatorId: req.session.userId });
+        return shop.save();
     }
     async updateShop(id, name) {
         const shop = await Shop_1.Shop.findOneBy({ id });
@@ -60,6 +71,13 @@ let ShopResolver = class ShopResolver {
         return true;
     }
 };
+__decorate([
+    (0, type_graphql_1.Query)(() => Shop_1.Shop),
+    __param(0, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ShopResolver.prototype, "shopWithUsers", null);
 __decorate([
     (0, type_graphql_1.Query)(() => [Shop_1.Shop]),
     __metadata("design:type", Function),

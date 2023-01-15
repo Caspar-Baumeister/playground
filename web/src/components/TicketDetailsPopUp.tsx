@@ -172,7 +172,9 @@ export const TicketDetailsPopUp: React.FC<propsType> = (props) => {
             </DialogContent>
           </Box>
         ) : (
-          <div>Loading...</div>
+          <Box flex={1} justifyContent={"center"} m={4}>
+            Keine Produkte
+          </Box>
         )}
 
         <DialogActions>

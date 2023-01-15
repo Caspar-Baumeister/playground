@@ -20,9 +20,9 @@ export class Ticket extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field()
-  @Column()
-  date!: string;
+  @Field(() => String)
+  @Column({ type: "date" })
+  date!: Date;
 
   @Field()
   @Column()

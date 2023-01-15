@@ -31,19 +31,6 @@ export default function CreateProductPopUpForm() {
   const [open, setOpen] = React.useState(false);
   const [tags, setTags] = React.useState<number[]>([]);
 
-  // const [InWeight, setInWeight] = React.useState(1);
-
-  //   const { loading, error, data } = useQuery(MY_SHOPS, {
-  //     variables: { limit: 10 },
-  //   });
-
-  // const handleSwitch = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setState({
-  //     ...state,
-  //     [event.target.name]: event.target.checked,
-  //   });
-  // };
-
   const validationSchema = yup.object({
     name: yup.string().required("Ein Produktname wird benötigt"),
     amount: yup.number().required("Eine Mengenangabe wird benötigt"),

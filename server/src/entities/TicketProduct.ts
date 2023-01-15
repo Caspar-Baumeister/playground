@@ -28,12 +28,16 @@ export class TicketProduct extends BaseEntity {
   productId: number;
 
   @Field(() => Product)
-  @ManyToOne(() => Product, (product) => product.ticketProducts)
+  @ManyToOne(() => Product, (product) => product.ticketProducts, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "productId" })
   product: Product;
 
   @Field(() => Ticket)
-  @ManyToOne(() => Ticket, (ticket) => ticket.ticketProducts)
+  @ManyToOne(() => Ticket, (ticket) => ticket.ticketProducts, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "ticketId" })
   ticket: Ticket;
 

@@ -213,6 +213,8 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [showAction, setShowAction] = React.useState(false);
+  const [showId, setShowId] = React.useState(0);
 
   const { loading, error, data } = useQuery(PRODUCTS_BY_SHOP_ID, {
     variables: { shopId: shopState?.shop?.id },
@@ -289,7 +291,17 @@ export default function EnhancedTable() {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.id}
+                      onMouseEnter={() => {
+                        setShowAction(true);
+                        setShowId(row.id);
+                      }}
+                      onMouseLeave={() => setShowAction(false)}
+                    >
                       {columns.map((column) => {
                         const value = row[column.id];
                         const item = row;
@@ -300,22 +312,26 @@ export default function EnhancedTable() {
                               align={column.align}
                               height={1}
                             >
-                              <Grid>
-                                <UpdateProductPopUpForm
-                                  productId={value as number}
-                                />
-                                <IconButton
-                                  size="small"
-                                  color="warning"
-                                  onClick={() =>
-                                    deleteProduct({
-                                      variables: { id: value as number },
-                                    })
-                                  }
-                                >
-                                  <DeleteIcon sx={{ fontSize: "18px" }} />
-                                </IconButton>
-                              </Grid>
+                              {row.id == showId && showAction ? (
+                                <Grid>
+                                  <UpdateProductPopUpForm
+                                    productId={value as number}
+                                  />
+                                  <IconButton
+                                    size="small"
+                                    color="warning"
+                                    onClick={() =>
+                                      deleteProduct({
+                                        variables: { id: value as number },
+                                      })
+                                    }
+                                  >
+                                    <DeleteIcon sx={{ fontSize: "18px" }} />
+                                  </IconButton>
+                                </Grid>
+                              ) : (
+                                <Box></Box>
+                              )}
                             </TableCell>
                           );
                         }

@@ -11,12 +11,12 @@ import TextField from "@mui/material/TextField";
 import { useFormik } from "formik";
 import * as React from "react";
 import * as yup from "yup";
-import SecectTags from "./SelectTags";
+import SecectTags from "../Components/SelectTags";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { UPDATE_PRODUCT } from "../graphql/mutations/product";
 import { ShopContext } from "../utiles/ShopContext";
 import PRODUCTS_BY_SHOP_ID, { PRODUCT } from "../graphql/queries/product";
-import { TagsData } from "./TableProducts";
+import { TagsData } from "../Components/TableProducts";
 
 type propsType = {
   productId: number;
