@@ -12,7 +12,7 @@ import { useFormik } from "formik";
 import * as React from "react";
 import * as yup from "yup";
 import SecectTags from "./SelectTags";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { UPDATE_PRODUCT } from "../graphql/mutations/product";
 import { ShopContext } from "../utiles/ShopContext";
 import PRODUCTS_BY_SHOP_ID, { PRODUCT } from "../graphql/queries/product";
@@ -79,11 +79,9 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
     initialValues: initialValues,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log("values", values);
       const response = await updateProduct({
         variables: { ...values, tags: tags, id: props.productId },
       });
-      console.log(response);
     },
   });
 
@@ -103,6 +101,11 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
     }
   }, [dataProduct]);
 
+  if (errorUpdateProduct) {
+    return <div>{errorUpdateProduct.message}</div>;
+  }
+
+  console.log("dataUpdateProduct", dataUpdateProduct);
   return (
     <>
       <IconButton
@@ -201,12 +204,11 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
                 </DialogContentText>
               </span>
             ) : null}
-            {dataUpdateProduct && dataUpdateProduct.product ? (
+            {dataUpdateProduct && dataUpdateProduct.updateProduct ? (
               <DialogContentText p={3}>
                 <span style={{ color: "green" }}>
-                  {" "}
-                  Das Produkt {dataUpdateProduct.product.name} wurde erfolgreich
-                  erstellt!
+                  Das Produkt {dataUpdateProduct.updateProduct.name} wurde
+                  erfolgreich bearbeitet!
                 </span>
               </DialogContentText>
             ) : null}

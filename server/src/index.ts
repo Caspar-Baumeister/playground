@@ -24,6 +24,7 @@ import { TicketProduct } from "./entities/TicketProduct";
 import { PosResolver } from "./resolvers/pos";
 import { TicketResolver } from "./resolvers/ticket";
 import { ShopUserResolver } from "./resolvers/shopUser";
+import { TicketProductResolver } from "./resolvers/ticketProduct";
 
 export const dataSource = new DataSource({
   type: "postgres",
@@ -96,6 +97,7 @@ const main = async () => {
         PosResolver,
         TicketResolver,
         ShopUserResolver,
+        TicketProductResolver,
       ],
       validate: false,
     }),

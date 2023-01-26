@@ -60,7 +60,6 @@ export const TicketDetailsPopUp: React.FC<propsType> = (props) => {
 
   React.useEffect(() => {
     if (dataProducts && dataProducts.ticketProducts) {
-      console.log(dataProducts.ticketProducts);
       setTicketProducts(dataProducts.ticketProducts);
     }
   }, [dataProducts]);
@@ -141,19 +140,19 @@ export const TicketDetailsPopUp: React.FC<propsType> = (props) => {
                           </TableCell>
                           <TableCell align="right">
                             {row.startAmount +
-                              (row.product.amountType ? " Stk" : " Kg")}
+                              (row.product.amountType ? " Kg" : " Stk")}
                           </TableCell>
                           <TableCell align="right">
                             {row.endAmount
                               ? row.endAmount +
-                                (row.product.amountType ? " Stk" : " Kg")
+                                (row.product.amountType ? " Kg" : " Stk")
                               : "-"}
                           </TableCell>
                           <TableCell align="right">
                             {row.endAmount
                               ? row.startAmount -
                                 row.endAmount +
-                                (row.product.amountType ? " Stk" : " Kg")
+                                (row.product.amountType ? " Kg" : " Stk")
                               : "-"}
                           </TableCell>
                           <TableCell align="right">

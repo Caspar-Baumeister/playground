@@ -83,7 +83,6 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
       const response = await updateProduct({
         variables: { ...values, tags: tags, id: props.productId },
       });
-      console.log(response);
     },
   });
 
@@ -190,7 +189,6 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
             <SecectTags
               handleTagChange={(event) => {
                 setTags(event);
-                console.log(tags);
               }}
               initialTags={tags}
             />

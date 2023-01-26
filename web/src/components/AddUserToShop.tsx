@@ -44,8 +44,6 @@ export default function AddUserToShop({ shopCreatorId }: inputProps) {
           if (user.shopUsers.length > 0) {
             var isInShop = false;
             user.shopUsers.forEach((shopUser: ShopUsers) => {
-              console.log("user.shopUsers[shopUser]", shopUser);
-              console.log(shopUser.shop.id, shopState!.shop!.id);
               if (shopUser.shop.id === shopState!.shop!.id) {
                 isInShop = true;
               }
@@ -113,7 +111,6 @@ export default function AddUserToShop({ shopCreatorId }: inputProps) {
           native={false}
           renderValue={(userId) => {
             const selectedUser = allUser.find((user) => user.id === userId);
-            console.log("selectedUser", selectedUser);
 
             return (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

@@ -18,8 +18,6 @@ interface CreateTicketFormPropType {
 }
 
 export default function CreateTicketForm(props: CreateTicketFormPropType) {
-  const [selectedDate, handleDateChange] = useState(new Date());
-
   return (
     // select User
     // select Position
@@ -65,13 +63,12 @@ export default function CreateTicketForm(props: CreateTicketFormPropType) {
             <DatePicker
               onChange={(value) => {
                 if (value) {
-                  handleDateChange(value);
                   return props.setData(props.index, "date", value);
                 }
                 return null;
               }}
               label="Verkaufstag"
-              value={selectedDate}
+              value={props.data.date}
               renderInput={(props) => <TextField {...props} />}
             />
           </Grid>
@@ -94,7 +91,11 @@ export default function CreateTicketForm(props: CreateTicketFormPropType) {
               type="number"
               value={props.data.startMoney}
               onChange={(e) =>
-                props.setData(props.index, e.target.name, e.target.value)
+                props.setData(
+                  props.index,
+                  e.target.name,
+                  Number.parseFloat(e.target.value)
+                )
               }
             />
           </Grid>

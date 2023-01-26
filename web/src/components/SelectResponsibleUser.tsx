@@ -39,9 +39,7 @@ export default function SelectResponsibleUser({
   const [userId, setUserId] = React.useState<number | undefined>(initialUser);
 
   React.useEffect(() => {
-    console.log("user where fetched", data);
     if (!error && !loading) {
-      console.log("user where fetched", data);
       var users: UserType[] = data.shopWithUsers.users.map(
         (shopUser: ShopUsers) => {
           return shopUser.user;
@@ -86,7 +84,6 @@ export default function SelectResponsibleUser({
           native={false}
           renderValue={(userId) => {
             const selectedUser = allUser.find((user) => user.id === userId);
-            console.log("selectedUser", selectedUser);
 
             return (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

@@ -94,23 +94,16 @@ export default function HomeLayout({ children }: Props) {
   if (error) return <div>{error.message}</div>;
 
   var myShops: ShopType[] = data.myShops;
-  console.log(myShops[0]);
   if (!shop && myShops[0]) {
     setShop(myShops[0]);
   }
 
-  console.log("shop", shop);
-
-  const handleChangeShop = (
-    event: SelectChangeEvent<number>,
-    child: React.ReactNode
-  ) => {
-    console.log("here:");
-    console.log(myShops.find((shop) => shop.id === event.target.value));
-    setShop(myShops.find((shop) => shop.id === event.target.value) ?? null);
-  };
-
-  console.log("id:", shop?.id);
+  // const handleChangeShop = (
+  //   event: SelectChangeEvent<number>,
+  //   child: React.ReactNode
+  // ) => {
+  //   setShop(myShops.find((shop) => shop.id === event.target.value) ?? null);
+  // };
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -137,7 +130,7 @@ export default function HomeLayout({ children }: Props) {
                 <MenuIcon />
               </IconButton>
               <FormControl sx={{ width: 300 }}>
-                <Select
+                {/* <Select
                   labelId="demo-simple-select-label"
                   renderValue={(value) =>
                     value ? (
@@ -171,7 +164,7 @@ export default function HomeLayout({ children }: Props) {
                       {_shop?.name}
                     </MenuItem>
                   ))}
-                </Select>
+                </Select> */}
               </FormControl>
             </Toolbar>
           </AppBar>

@@ -82,7 +82,7 @@ export default function Login() {
         });
       } else if (response?.data.login.user) {
         // a cooky is saved trough the successfull login function
-        navigate("/");
+        navigate("/inventory");
       }
       return response;
     },

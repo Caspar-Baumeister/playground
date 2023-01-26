@@ -66,7 +66,6 @@ export default function SecectUser({
           native={false}
           renderValue={(UserId) => {
             const selectedUser = allUser.find((User) => User.id === UserId);
-            console.log("selectedUser", selectedUser);
 
             return (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

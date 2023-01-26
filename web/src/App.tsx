@@ -38,10 +38,10 @@ const router = createBrowserRouter([
         path: "/tickets",
         element: <TicketsHome />,
       },
-      {
-        path: "/",
-        element: <Users />,
-      },
+      // {
+      //   path: "/",
+      //   element: <Users />,
+      // },
       {
         path: "/create-tickets",
         element: <CreateTickets />,

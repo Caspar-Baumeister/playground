@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TicketResolver = void 0;
 const Ticket_1 = require("../entities/Ticket");
 const type_graphql_1 = require("type-graphql");
-const TicketProduct_1 = require("../entities/TicketProduct");
 const __1 = require("..");
 let TicketResolver = class TicketResolver {
     tickets() {
@@ -31,8 +30,19 @@ let TicketResolver = class TicketResolver {
             .orderBy('ticket."updatedAt"', "DESC")
             .getMany();
     }
-    async createTicket(responsibleUserId, posId, startMoney, endMoney, shopId, status, date, startComment, endComment, productIds, startAmounts) {
-        const ticket = Ticket_1.Ticket.create({
+    ticketsByShopIdAndUserId(shopId, userId) {
+        return __1.dataSource
+            .getRepository(Ticket_1.Ticket)
+            .createQueryBuilder("ticket")
+            .where("ticket.shopId = :id", { id: shopId })
+            .andWhere("ticket.responsibleUserId = :id", { id: userId })
+            .leftJoinAndSelect("ticket.pos", "pos")
+            .leftJoinAndSelect("ticket.responsibleUser", "responsibleUser")
+            .orderBy('ticket."updatedAt"', "DESC")
+            .getMany();
+    }
+    async createTicket(responsibleUserId, posId, startMoney, endMoney, shopId, status, date, startComment, endComment) {
+        return Ticket_1.Ticket.create({
             responsibleUserId,
             date,
             endComment,
@@ -42,17 +52,7 @@ let TicketResolver = class TicketResolver {
             shopId,
             status,
             endMoney,
-        });
-        await ticket.save();
-        productIds.forEach(async (value, index) => {
-            const ticketProduct = TicketProduct_1.TicketProduct.create({
-                productId: value,
-                ticketId: ticket.id,
-                startAmount: startAmounts[index],
-            });
-            await ticketProduct.save();
-        });
-        return ticket;
+        }).save();
     }
     ticket(id) {
         return (__1.dataSource
@@ -60,30 +60,6 @@ let TicketResolver = class TicketResolver {
             .createQueryBuilder("ticket")
             .where("ticket.id = :id", { id })
             .getOne());
-    }
-    ticketProducts(ticketId) {
-        return __1.dataSource
-            .getRepository(TicketProduct_1.TicketProduct)
-            .createQueryBuilder("tp")
-            .where("tp.ticketId = :id", { id: ticketId })
-            .leftJoinAndSelect("tp.product", "product")
-            .getMany();
-    }
-    async updateTicketProduct(ticketId, productId, startAmount, endAmount) {
-        const ticketProduct = await TicketProduct_1.TicketProduct.findOneBy({
-            ticketId,
-            productId,
-        });
-        if (!ticketProduct) {
-            return null;
-        }
-        if (startAmount >= 0) {
-            ticketProduct.startAmount = startAmount;
-        }
-        if (endAmount >= 0) {
-            ticketProduct.endAmount = endAmount;
-        }
-        return ticketProduct.save();
     }
     async deleteTicket(id) {
         try {
@@ -118,20 +94,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TicketResolver.prototype, "ticketsByShopId", null);
 __decorate([
+    (0, type_graphql_1.Query)(() => [Ticket_1.Ticket]),
+    __param(0, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
+    __param(1, (0, type_graphql_1.Arg)("userId", () => type_graphql_1.ID)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", Promise)
+], TicketResolver.prototype, "ticketsByShopIdAndUserId", null);
+__decorate([
     (0, type_graphql_1.Mutation)(() => Ticket_1.Ticket),
     __param(0, (0, type_graphql_1.Arg)("responsibleUserId", () => type_graphql_1.ID)),
     __param(1, (0, type_graphql_1.Arg)("posId", () => type_graphql_1.ID)),
     __param(2, (0, type_graphql_1.Arg)("startMoney", () => type_graphql_1.Float)),
     __param(3, (0, type_graphql_1.Arg)("endMoney", () => type_graphql_1.Float, { nullable: true })),
-    __param(4, (0, type_graphql_1.Arg)("shopId")),
+    __param(4, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
     __param(5, (0, type_graphql_1.Arg)("status")),
     __param(6, (0, type_graphql_1.Arg)("date", () => Date)),
     __param(7, (0, type_graphql_1.Arg)("startComment", { nullable: true })),
     __param(8, (0, type_graphql_1.Arg)("endComment", { nullable: true })),
-    __param(9, (0, type_graphql_1.Arg)("productIds", () => [type_graphql_1.ID])),
-    __param(10, (0, type_graphql_1.Arg)("startAmounts", () => [type_graphql_1.Float])),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, Number, Number, Number, Number, String, String, String, Array, Array]),
+    __metadata("design:paramtypes", [Number, Number, Number, Number, Number, Number, String, String, String]),
     __metadata("design:returntype", Promise)
 ], TicketResolver.prototype, "createTicket", null);
 __decorate([
@@ -141,23 +123,6 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], TicketResolver.prototype, "ticket", null);
-__decorate([
-    (0, type_graphql_1.Query)(() => [TicketProduct_1.TicketProduct], { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("ticketId", () => type_graphql_1.ID)),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], TicketResolver.prototype, "ticketProducts", null);
-__decorate([
-    (0, type_graphql_1.Mutation)(() => TicketProduct_1.TicketProduct, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("ticketId", () => type_graphql_1.ID)),
-    __param(1, (0, type_graphql_1.Arg)("productId", () => type_graphql_1.ID)),
-    __param(2, (0, type_graphql_1.Arg)("startAmount")),
-    __param(3, (0, type_graphql_1.Arg)("endAmount")),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, Number, Number]),
-    __metadata("design:returntype", Promise)
-], TicketResolver.prototype, "updateTicketProduct", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)("id")),

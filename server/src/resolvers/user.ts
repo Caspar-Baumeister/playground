@@ -7,6 +7,7 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UseMiddleware,
 } from "type-graphql";
 import { v4 } from "uuid";
 import { dataSource } from "..";
@@ -14,6 +15,8 @@ import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
 import { User } from "../entities/User";
 import { MyContext } from "../types";
 import { sendEmail } from "../utiles/sendEmail";
+import { sign } from "jsonwebtoken";
+import { isAuthJWT } from "../middleware/isAuth";
 
 @ObjectType()
 class FieldError {
@@ -29,6 +32,14 @@ class UserResponse {
   errors?: FieldError[];
   @Field(() => User, { nullable: true })
   user?: User;
+}
+
+@ObjectType()
+class LoginResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+  @Field()
+  accessToken?: string;
 }
 
 @Resolver()
@@ -54,11 +65,12 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { req }: MyContext) {
-    if (!req.session.userId) {
+  @UseMiddleware(isAuthJWT)
+  async me(@Ctx() { payload }: MyContext) {
+    if (!payload?.userId) {
       return null;
     }
-    return await User.findOneBy({ id: req.session.userId });
+    return await User.findOneBy({ id: Number.parseFloat(payload?.userId) });
   }
 
   @Mutation(() => UserResponse)
@@ -212,12 +224,12 @@ export class UserResolver {
     return { user: user };
   }
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => LoginResponse)
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string,
     @Ctx() { req }: MyContext
-  ): Promise<UserResponse> {
+  ): Promise<LoginResponse> {
     const user = await User.findOneBy({ email: email });
     console.log("inside login", user);
     if (!user) {
@@ -244,7 +256,12 @@ export class UserResolver {
 
     req.session.userId = user.id;
     console.log("userpassword is valid", req.session.userId);
-    return { user: user };
+    return {
+      accessToken: sign({ userId: user.id }, "MySecretKey", {
+        expiresIn: "365 days",
+      }),
+    };
+    // return { user: user };
   }
 
   @Mutation(() => Boolean)

@@ -29,6 +29,7 @@ const TicketProduct_1 = require("./entities/TicketProduct");
 const pos_1 = require("./resolvers/pos");
 const ticket_1 = require("./resolvers/ticket");
 const shopUser_1 = require("./resolvers/shopUser");
+const ticketProduct_1 = require("./resolvers/ticketProduct");
 exports.dataSource = new typeorm_1.DataSource({
     type: "postgres",
     database: "playground",
@@ -79,6 +80,7 @@ const main = async () => {
                 pos_1.PosResolver,
                 ticket_1.TicketResolver,
                 shopUser_1.ShopUserResolver,
+                ticketProduct_1.TicketProductResolver,
             ],
             validate: false,
         }),

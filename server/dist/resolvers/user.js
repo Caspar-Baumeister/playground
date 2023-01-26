@@ -23,6 +23,8 @@ const __1 = require("..");
 const constants_1 = require("../constants");
 const User_1 = require("../entities/User");
 const sendEmail_1 = require("../utiles/sendEmail");
+const jsonwebtoken_1 = require("jsonwebtoken");
+const isAuth_1 = require("../middleware/isAuth");
 let FieldError = class FieldError {
 };
 __decorate([
@@ -49,6 +51,19 @@ __decorate([
 UserResponse = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], UserResponse);
+let LoginResponse = class LoginResponse {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => [FieldError], { nullable: true }),
+    __metadata("design:type", Array)
+], LoginResponse.prototype, "errors", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], LoginResponse.prototype, "accessToken", void 0);
+LoginResponse = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], LoginResponse);
 let UserResolver = class UserResolver {
     users() {
         return User_1.User.find();
@@ -61,11 +76,11 @@ let UserResolver = class UserResolver {
             .leftJoinAndSelect("su.shop", "shop")
             .getMany());
     }
-    async me({ req }) {
-        if (!req.session.userId) {
+    async me({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.userId)) {
             return null;
         }
-        return await User_1.User.findOneBy({ id: req.session.userId });
+        return await User_1.User.findOneBy({ id: Number.parseFloat(payload === null || payload === void 0 ? void 0 : payload.userId) });
     }
     async changePassword(token, newPassword, { redis, req }) {
         if (newPassword.length < 2) {
@@ -208,7 +223,11 @@ let UserResolver = class UserResolver {
         }
         req.session.userId = user.id;
         console.log("userpassword is valid", req.session.userId);
-        return { user: user };
+        return {
+            accessToken: (0, jsonwebtoken_1.sign)({ userId: user.id }, "MySecretKey", {
+                expiresIn: "365 days",
+            }),
+        };
     }
     logout({ req, res }) {
         return new Promise((resolve) => req.session.destroy((err) => {
@@ -238,6 +257,7 @@ __decorate([
 ], UserResolver.prototype, "usersWithShops", null);
 __decorate([
     (0, type_graphql_1.Query)(() => User_1.User, { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -271,7 +291,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => UserResponse),
+    (0, type_graphql_1.Mutation)(() => LoginResponse),
     __param(0, (0, type_graphql_1.Arg)("email")),
     __param(1, (0, type_graphql_1.Arg)("password")),
     __param(2, (0, type_graphql_1.Ctx)()),

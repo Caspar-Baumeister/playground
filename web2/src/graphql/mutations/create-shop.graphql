@@ -1,9 +1,0 @@
-mutation createShop($name: String!)  {
-  createShop(name: $name) {
-    _id
-    createdAt   
-    updatedAt
-    creatorId
-    name
-  }
-}

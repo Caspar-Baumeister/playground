@@ -89,7 +89,7 @@ export default function Register() {
         });
       } else if (response?.data.register.user) {
         // a cooky is saved trough the successfull register function
-        navigate("/");
+        navigate("/inventory");
       } else {
         return response;
       }

@@ -8,6 +8,7 @@ export type MyContext = {
   req: Request & { session: Session & { userId?: number; shopId?: number } };
   res: Response;
   redis: Redis;
+  payload?: { userId: string };
 };
 
 @ObjectType()

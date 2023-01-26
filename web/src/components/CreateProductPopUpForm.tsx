@@ -60,11 +60,9 @@ export default function CreateProductPopUpForm() {
     initialValues: initialValues,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
       const response = await saveProduct({
         variables: { ...values, tags: tags },
       });
-      console.log(response);
     },
   });
 

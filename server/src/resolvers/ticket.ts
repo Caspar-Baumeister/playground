@@ -1,6 +1,5 @@
 import { Ticket } from "../entities/Ticket";
 import { Arg, Float, ID, Mutation, Query, Resolver } from "type-graphql";
-import { TicketProduct } from "../entities/TicketProduct";
 import { dataSource } from "..";
 
 @Resolver()
@@ -22,22 +21,36 @@ export class TicketResolver {
       .getMany();
   }
 
+  @Query(() => [Ticket])
+  ticketsByShopIdAndUserId(
+    @Arg("shopId", () => ID) shopId: number,
+    @Arg("userId", () => ID) userId: number
+  ): Promise<Ticket[]> {
+    return dataSource
+      .getRepository(Ticket)
+      .createQueryBuilder("ticket")
+      .where("ticket.shopId = :id", { id: shopId })
+      .andWhere("ticket.responsibleUserId = :id", { id: userId })
+      .leftJoinAndSelect("ticket.pos", "pos")
+      .leftJoinAndSelect("ticket.responsibleUser", "responsibleUser")
+      .orderBy('ticket."updatedAt"', "DESC")
+      .getMany();
+  }
+
   @Mutation(() => Ticket)
   async createTicket(
     @Arg("responsibleUserId", () => ID) responsibleUserId: number,
     @Arg("posId", () => ID) posId: number,
     @Arg("startMoney", () => Float) startMoney: number,
     @Arg("endMoney", () => Float, { nullable: true }) endMoney: number,
-    @Arg("shopId") shopId: number,
+    @Arg("shopId", () => ID) shopId: number,
     @Arg("status") status: number,
     @Arg("date", () => Date) date: string,
     @Arg("startComment", { nullable: true }) startComment: string,
-    @Arg("endComment", { nullable: true }) endComment: string,
-    @Arg("productIds", () => [ID]) productIds: number[],
-    @Arg("startAmounts", () => [Float]) startAmounts: number[]
+    @Arg("endComment", { nullable: true }) endComment: string
   ): Promise<Ticket> {
     // create ticket
-    const ticket = Ticket.create({
+    return Ticket.create({
       responsibleUserId,
       date,
       endComment,
@@ -47,22 +60,7 @@ export class TicketResolver {
       shopId,
       status,
       endMoney,
-    });
-
-    await ticket.save();
-
-    // create and save TicketProducts
-    productIds.forEach(async (value, index) => {
-      const ticketProduct = TicketProduct.create({
-        productId: value,
-        ticketId: ticket.id,
-        startAmount: startAmounts[index],
-      });
-      await ticketProduct.save();
-    });
-
-    // TODO put the TicketProducts inside the ticket???
-    return ticket;
+    }).save();
   }
 
   @Query(() => Ticket, { nullable: true })
@@ -75,42 +73,6 @@ export class TicketResolver {
         //   .leftJoinAndSelect("ticket.ticketProducts", "ticketProducts")
         .getOne()
     );
-  }
-
-  @Query(() => [TicketProduct], { nullable: true })
-  ticketProducts(
-    @Arg("ticketId", () => ID) ticketId: number
-  ): Promise<TicketProduct[] | null> {
-    return dataSource
-      .getRepository(TicketProduct)
-      .createQueryBuilder("tp")
-      .where("tp.ticketId = :id", { id: ticketId })
-      .leftJoinAndSelect("tp.product", "product")
-      .getMany();
-  }
-
-  @Mutation(() => TicketProduct, { nullable: true })
-  async updateTicketProduct(
-    @Arg("ticketId", () => ID) ticketId: number,
-    @Arg("productId", () => ID) productId: number,
-    @Arg("startAmount") startAmount: number,
-    @Arg("endAmount") endAmount: number
-  ): Promise<TicketProduct | null> {
-    const ticketProduct = await TicketProduct.findOneBy({
-      ticketId,
-      productId,
-    });
-    if (!ticketProduct) {
-      return null;
-    }
-    if (startAmount >= 0) {
-      ticketProduct.startAmount = startAmount;
-    }
-    if (endAmount >= 0) {
-      ticketProduct.endAmount = endAmount;
-    }
-
-    return ticketProduct.save();
   }
 
   @Mutation(() => Boolean)

@@ -26,6 +26,7 @@ import CreateProductPopUpForm from "./CreateProductPopUpForm";
 import CreateTagPopUpForm from "./CreateTagPopUpForm";
 import { DELETE_PRODUCT } from "../graphql/mutations/product";
 import { UpdateProductPopUpForm } from "./UpdateProductPopUpForm copy";
+import SearchProductsAutoComplete from "./SearchProductsAutoComplete";
 
 export interface TagsData {
   id: number;
@@ -117,47 +118,11 @@ const columns: readonly Column[] = [
   },
 ];
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  // width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    // marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
+interface SearchProductsAutoCompletePropsType {
+  products: ProductData[];
+}
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
-
-function EnhancedTableToolbar() {
+function EnhancedTableToolbar(props: SearchProductsAutoCompletePropsType) {
   return (
     <Toolbar
       sx={{
@@ -175,15 +140,7 @@ function EnhancedTableToolbar() {
             </Tooltip>
           </Grid>
           <Grid item xs={0}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
+            <SearchProductsAutoComplete products={props.products} />
           </Grid>
         </Grid>
       }
@@ -215,6 +172,7 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [showAction, setShowAction] = React.useState(false);
   const [showId, setShowId] = React.useState(0);
+  const [products, setProducts] = React.useState<ProductData[] | null>(null);
 
   const { loading, error, data } = useQuery(PRODUCTS_BY_SHOP_ID, {
     variables: { shopId: shopState?.shop?.id },
@@ -231,6 +189,12 @@ export default function EnhancedTable() {
       },
     ],
   });
+
+  React.useEffect(() => {
+    if (!error && !loading) {
+      setProducts(data.productsByShopId);
+    }
+  }, [data]);
 
   if (loading) return <div>loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -266,7 +230,7 @@ export default function EnhancedTable() {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar />
+        <EnhancedTableToolbar products={rawData} />
         <TableContainer>
           <Table
             stickyHeader
