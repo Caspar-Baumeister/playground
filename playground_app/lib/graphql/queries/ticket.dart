@@ -1,6 +1,6 @@
-String ticketsByShopIdAndUserId = """
-query ticketsByShopIdAndUserId(\$shopId: ID!, \$userId: ID!) {
-    ticketsByShopIdAndUserId(shopId: \$shopId,userId: \$userId) {
+String ticketsOfUser = """
+query {
+    ticketsOfUser{
       id
       date
       responsibleUser {
@@ -27,11 +27,13 @@ query TicketProducts(\$ticketId: ID!) {
     ticketProducts(ticketId: \$ticketId) {
       startAmount
       endAmount
+      productId
       product {
         amountType
         price
         name
         id
+        amount
       }
     }
   }""";

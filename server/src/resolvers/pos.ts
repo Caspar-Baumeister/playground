@@ -1,6 +1,15 @@
 import { PointOfSell } from "../entities/PointOfSell";
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { dataSource } from "..";
+import { isAuthJWT } from "../middleware/isAuth";
+import { MyContext } from "../types";
 
 @Resolver()
 export class PosResolver {
@@ -9,22 +18,33 @@ export class PosResolver {
     return PointOfSell.find();
   }
 
-  @Query(() => [PointOfSell])
-  posByShopId(@Arg("shopId") shopId: number): Promise<PointOfSell[]> {
+  @Query(() => [PointOfSell], { nullable: true })
+  @UseMiddleware(isAuthJWT)
+  posOfShop(@Ctx() { payload }: MyContext): Promise<PointOfSell[]> | null {
+    if (!payload?.shopId) {
+      return null;
+    }
     return dataSource
       .getRepository(PointOfSell)
       .createQueryBuilder("pos")
-      .where("pos.shopId = :id", { id: shopId })
+      .where("pos.shopId = :id", { id: Number.parseFloat(payload.shopId) })
       .orderBy("pos.updatedAt", "DESC")
       .getMany();
   }
 
   @Mutation(() => PointOfSell)
+  @UseMiddleware(isAuthJWT)
   async createPointOfSell(
-    @Arg("shopId") shopId: number,
+    @Ctx() { payload }: MyContext,
     @Arg("name") name: string
-  ): Promise<PointOfSell> {
-    return PointOfSell.create({ name, shopId }).save();
+  ): Promise<PointOfSell | null> {
+    if (!payload?.shopId) {
+      return null;
+    }
+    return PointOfSell.create({
+      name,
+      shopId: Number.parseFloat(payload.shopId),
+    }).save();
   }
 
   @Mutation(() => Boolean)

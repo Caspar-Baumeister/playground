@@ -17,13 +17,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const argon2_1 = __importDefault(require("argon2"));
+const jsonwebtoken_1 = require("jsonwebtoken");
 const type_graphql_1 = require("type-graphql");
-const uuid_1 = require("uuid");
 const __1 = require("..");
 const constants_1 = require("../constants");
 const User_1 = require("../entities/User");
-const sendEmail_1 = require("../utiles/sendEmail");
-const jsonwebtoken_1 = require("jsonwebtoken");
 const isAuth_1 = require("../middleware/isAuth");
 let FieldError = class FieldError {
 };
@@ -38,19 +36,6 @@ __decorate([
 FieldError = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], FieldError);
-let UserResponse = class UserResponse {
-};
-__decorate([
-    (0, type_graphql_1.Field)(() => [FieldError], { nullable: true }),
-    __metadata("design:type", Array)
-], UserResponse.prototype, "errors", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
-    __metadata("design:type", User_1.User)
-], UserResponse.prototype, "user", void 0);
-UserResponse = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], UserResponse);
 let LoginResponse = class LoginResponse {
 };
 __decorate([
@@ -58,7 +43,7 @@ __decorate([
     __metadata("design:type", Array)
 ], LoginResponse.prototype, "errors", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
+    (0, type_graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], LoginResponse.prototype, "accessToken", void 0);
 LoginResponse = __decorate([
@@ -66,73 +51,109 @@ LoginResponse = __decorate([
 ], LoginResponse);
 let UserResolver = class UserResolver {
     users() {
-        return User_1.User.find();
-    }
-    usersWithShops() {
-        return (__1.dataSource
+        return __1.dataSource
             .getRepository(User_1.User)
             .createQueryBuilder("user")
-            .leftJoinAndSelect("user.shopUsers", "su")
-            .leftJoinAndSelect("su.shop", "shop")
-            .getMany());
+            .leftJoinAndSelect("user.shop", "shop")
+            .getMany();
+    }
+    userOfShop({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.userId)) {
+            return null;
+        }
+        return __1.dataSource
+            .getRepository(User_1.User)
+            .createQueryBuilder("user")
+            .where("user.shopId = :id", { id: Number.parseFloat(payload.userId) })
+            .leftJoinAndSelect("user.shop", "shop")
+            .getMany();
     }
     async me({ payload }) {
         if (!(payload === null || payload === void 0 ? void 0 : payload.userId)) {
             return null;
         }
-        return await User_1.User.findOneBy({ id: Number.parseFloat(payload === null || payload === void 0 ? void 0 : payload.userId) });
+        return __1.dataSource
+            .getRepository(User_1.User)
+            .createQueryBuilder("user")
+            .where("user.id = :id", { id: Number.parseFloat(payload === null || payload === void 0 ? void 0 : payload.userId) })
+            .leftJoinAndSelect("user.shop", "shop")
+            .getOne();
     }
-    async changePassword(token, newPassword, { redis, req }) {
-        if (newPassword.length < 2) {
+    async addEmployee({ payload }, name, email, password, role) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.userId)) {
             return {
                 errors: [
                     {
-                        field: "newPassword",
-                        message: "lenght must be greater then 2",
+                        field: "shopId",
+                        message: "no shopId in token",
                     },
                 ],
             };
         }
-        const key = constants_1.FORGET_PASSWORD_PREFIX + token;
-        const userId = await redis.get(key);
-        if (!userId) {
+        if (name.length <= 2) {
             return {
                 errors: [
                     {
-                        field: "token",
-                        message: "token expired",
+                        field: "name",
+                        message: "invalid name",
                     },
                 ],
             };
         }
-        const id = parseInt(userId);
-        const user = await User_1.User.findOneBy({ id });
-        if (!user) {
+        if (email.length <= 2) {
             return {
                 errors: [
                     {
-                        field: "token",
-                        message: "user no longer exist",
+                        field: "email",
+                        message: "invalid email",
                     },
                 ],
             };
         }
-        await User_1.User.update({ id }, { password: await argon2_1.default.hash(newPassword) });
-        req.session.userId = parseInt(userId);
-        await redis.del(key);
-        return { user: user };
-    }
-    async forgotPassword(email, { redis }) {
-        const user = await User_1.User.findOneBy({ email });
-        if (!user) {
-            return true;
+        if (password.length <= 2) {
+            return {
+                errors: [
+                    {
+                        field: "password",
+                        message: "invalid password",
+                    },
+                ],
+            };
         }
-        const token = (0, uuid_1.v4)();
-        await redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user.id, "EX", 1000 * 60 * 60 * 24 * 3);
-        (0, sendEmail_1.sendEmail)(email, `<a href= "http://localhost:3000/change-password/${token}"> reset password </a>`);
-        return true;
+        const hashedPassword = await argon2_1.default.hash(password);
+        try {
+            await User_1.User.create({
+                email,
+                password: hashedPassword,
+                name,
+                shopId: Number.parseInt(payload.shopId),
+                role,
+            }).save();
+        }
+        catch (error) {
+            console.log("ERR", error);
+            if (error.code === "23505" || error.detail.includes["already exists"]) {
+                return {
+                    errors: [
+                        {
+                            field: "email",
+                            message: "email already exists",
+                        },
+                    ],
+                };
+            }
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: error.detail,
+                    },
+                ],
+            };
+        }
+        return {};
     }
-    async register(name, email, password, { req }) {
+    async register(name, email, password, shopId, role) {
         if (name.length <= 2) {
             return {
                 errors: [
@@ -167,13 +188,14 @@ let UserResolver = class UserResolver {
         let user;
         try {
             user = await User_1.User.create({
-                email: email,
+                email,
                 password: hashedPassword,
-                name: name,
+                name,
+                shopId,
+                role,
             }).save();
         }
         catch (error) {
-            console.log("ERR", error);
             if (error.code === "23505" || error.detail.includes["already exists"]) {
                 return {
                     errors: [
@@ -193,11 +215,13 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        req.session.userId = user.id;
-        console.log(req.session.userId);
-        return { user: user };
+        return {
+            accessToken: (0, jsonwebtoken_1.sign)({ userId: user.id, shopId: user.shopId }, "MySecretKey", {
+                expiresIn: "365 days",
+            }),
+        };
     }
-    async login(email, password, { req }) {
+    async login(email, password) {
         const user = await User_1.User.findOneBy({ email: email });
         console.log("inside login", user);
         if (!user) {
@@ -221,10 +245,8 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        req.session.userId = user.id;
-        console.log("userpassword is valid", req.session.userId);
         return {
-            accessToken: (0, jsonwebtoken_1.sign)({ userId: user.id }, "MySecretKey", {
+            accessToken: (0, jsonwebtoken_1.sign)({ userId: user.id, shopId: user.shopId }, "MySecretKey", {
                 expiresIn: "365 days",
             }),
         };
@@ -244,17 +266,19 @@ let UserResolver = class UserResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => [User_1.User]),
+    (0, type_graphql_1.Query)(() => [User_1.User], { nullable: true }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "users", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [User_1.User]),
+    (0, type_graphql_1.Query)(() => [User_1.User], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], UserResolver.prototype, "usersWithShops", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
+], UserResolver.prototype, "userOfShop", null);
 __decorate([
     (0, type_graphql_1.Query)(() => User_1.User, { nullable: true }),
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
@@ -264,39 +288,34 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "me", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => UserResponse),
-    __param(0, (0, type_graphql_1.Arg)("token")),
-    __param(1, (0, type_graphql_1.Arg)("newPassword")),
-    __param(2, (0, type_graphql_1.Ctx)()),
+    (0, type_graphql_1.Mutation)(() => LoginResponse),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __param(1, (0, type_graphql_1.Arg)("name")),
+    __param(2, (0, type_graphql_1.Arg)("email")),
+    __param(3, (0, type_graphql_1.Arg)("password")),
+    __param(4, (0, type_graphql_1.Arg)("role")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:paramtypes", [Object, String, String, String, Number]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "changePassword", null);
+], UserResolver.prototype, "addEmployee", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)("email")),
-    __param(1, (0, type_graphql_1.Ctx)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], UserResolver.prototype, "forgotPassword", null);
-__decorate([
-    (0, type_graphql_1.Mutation)(() => UserResponse),
+    (0, type_graphql_1.Mutation)(() => LoginResponse),
     __param(0, (0, type_graphql_1.Arg)("name")),
     __param(1, (0, type_graphql_1.Arg)("email")),
     __param(2, (0, type_graphql_1.Arg)("password")),
-    __param(3, (0, type_graphql_1.Ctx)()),
+    __param(3, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
+    __param(4, (0, type_graphql_1.Arg)("role")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Object]),
+    __metadata("design:paramtypes", [String, String, String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => LoginResponse),
     __param(0, (0, type_graphql_1.Arg)("email")),
     __param(1, (0, type_graphql_1.Arg)("password")),
-    __param(2, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 __decorate([

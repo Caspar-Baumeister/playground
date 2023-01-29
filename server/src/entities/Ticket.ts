@@ -46,6 +46,10 @@ export class Ticket extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  midComment: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   endComment: string;
 
   @Field()
@@ -56,13 +60,13 @@ export class Ticket extends BaseEntity {
   @Column()
   shopId!: number;
 
-  @Field()
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.tickets)
   responsibleUser: User;
 
-  @Field()
+  @Field(() => PointOfSell)
   @ManyToOne(() => PointOfSell, (pos) => pos.tickets)
-  pos: PointOfSell;
+  pos!: PointOfSell;
 
   @Field(() => [TicketProduct], { nullable: true })
   @OneToMany(() => TicketProduct, (sp) => sp.product, { nullable: true })

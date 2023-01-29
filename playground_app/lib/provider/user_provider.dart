@@ -20,8 +20,7 @@ class UserProvider extends ChangeNotifier {
     if (user["id"] == null || user["name"] == null) {
       return false;
     }
-    activeUser = User(
-        id: user["id"].toString(), name: user["name"], email: user["email"]);
+    activeUser = User.fromJson(user);
 
     notifyListeners();
     return true;

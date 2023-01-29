@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:playground_app/graphql/queries/product.dart';
+import 'package:playground_app/models/product_model.dart';
 import 'package:playground_app/pages/single_product_view/widgets/single_product_body.dart';
 
 class SingleProductQuery extends StatelessWidget {
@@ -28,10 +29,12 @@ class SingleProductQuery extends StatelessWidget {
           return const Text('Loading');
         }
 
-        dynamic product = result.data?['product'];
+        Product? product;
 
-        if (product == null) {
-          return const Text('No products');
+        if (result.data?['product'] != null) {
+          product = Product.fromJson(result.data?['product']);
+        } else {
+          return const Text('No product');
         }
 
         return SingleProductBody(product: product);

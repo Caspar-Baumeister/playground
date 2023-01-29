@@ -26,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     emailController = TextEditingController(text: "a@b.de");
     passwordController = TextEditingController(text: "penis123");
-
     super.initState();
   }
 

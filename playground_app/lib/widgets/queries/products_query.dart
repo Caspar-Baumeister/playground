@@ -10,10 +10,8 @@ class ProductsQuery extends StatelessWidget {
     return Query(
       options: QueryOptions(
         document:
-            gql(productsByShopId), // this is the query string you just created
-        variables: const {
-          'shopId': 2,
-        },
+            gql(productsOfShop), // this is the query string you just created
+
         pollInterval: const Duration(seconds: 10),
       ),
       // Just like in apollo refetch() could be used to manually trigger a refetch
@@ -29,7 +27,7 @@ class ProductsQuery extends StatelessWidget {
           return const Text('Loading');
         }
 
-        List? products = result.data?['productsByShopId'];
+        List? products = result.data?['productsOfShop'];
 
         if (products == null) {
           return const Text('No products');

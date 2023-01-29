@@ -32,13 +32,7 @@ const validationSchema = yup.object({
 const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
-      user {
-        id
-        name
-        email
-        createdAt
-        updatedAt
-      }
+      accessToken
       errors {
         field
         message
@@ -69,6 +63,7 @@ export default function Login() {
       var response;
       try {
         response = await login({ variables: values });
+        console.log(response);
       } catch (error) {
         console.log(error);
       }
@@ -80,8 +75,9 @@ export default function Login() {
           email: errorMap["email"],
           password: errorMap["password"],
         });
-      } else if (response?.data.login.user) {
-        // a cooky is saved trough the successfull login function
+      } else if (response?.data.login.accessToken) {
+        // safe the cooky in the successfull login function
+        localStorage.setItem("token", response.data.login.accessToken);
         navigate("/inventory");
       }
       return response;

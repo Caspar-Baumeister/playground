@@ -4,14 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Ticket } from "./Ticket";
 import { Product } from "./Product";
-import { ShopUser } from "./ShopUser";
 import { Tag } from "./Tag";
 import { User } from "./User";
 
@@ -26,14 +24,6 @@ export class Shop extends BaseEntity {
   @Column()
   name!: string;
 
-  @Field()
-  @Column()
-  creatorId!: number;
-
-  @Field(() => User, { nullable: true })
-  @ManyToOne(() => User, (user) => user.createdShops, { onDelete: "SET NULL" })
-  creator: User;
-
   @Field(() => [Product], { nullable: true })
   @OneToMany(() => Product, (product) => product.shop)
   products: Product[];
@@ -46,9 +36,9 @@ export class Shop extends BaseEntity {
   @OneToMany(() => Ticket, (ticket) => ticket.shopId)
   tickets: Ticket[];
 
-  @Field(() => [ShopUser], { nullable: true })
-  @OneToMany(() => ShopUser, (shopUser) => shopUser.shop)
-  users: ShopUser[];
+  @Field(() => [User], { nullable: true })
+  @OneToMany(() => User, (user) => user.shop)
+  users: User[];
 
   @Field(() => String)
   @CreateDateColumn()

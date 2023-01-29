@@ -56,6 +56,11 @@ __decorate([
     (0, type_graphql_1.Field)({ nullable: true }),
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
+], Ticket.prototype, "midComment", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
 ], Ticket.prototype, "endComment", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
@@ -68,12 +73,12 @@ __decorate([
     __metadata("design:type", Number)
 ], Ticket.prototype, "shopId", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
+    (0, type_graphql_1.Field)(() => User_1.User),
     (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.tickets),
     __metadata("design:type", User_1.User)
 ], Ticket.prototype, "responsibleUser", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
+    (0, type_graphql_1.Field)(() => PointOfSell_1.PointOfSell),
     (0, typeorm_1.ManyToOne)(() => PointOfSell_1.PointOfSell, (pos) => pos.tickets),
     __metadata("design:type", PointOfSell_1.PointOfSell)
 ], Ticket.prototype, "pos", void 0);

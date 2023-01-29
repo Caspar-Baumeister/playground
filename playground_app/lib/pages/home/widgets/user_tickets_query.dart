@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:playground_app/graphql/queries/ticket.dart';
-import 'package:playground_app/pages/selling_process_ticket/selling_process_ticket.dart';
+import 'package:playground_app/models/ticket_model.dart';
+import 'package:playground_app/pages/ticket_page/ticket_page.dart';
 import 'package:playground_app/provider/user_provider.dart';
+import 'package:playground_app/utiles/helper_functions.dart';
+import 'package:playground_app/utiles/text_styles.dart';
 import 'package:provider/provider.dart';
 
 class UserTicketsQuery extends StatelessWidget {
@@ -15,11 +18,8 @@ class UserTicketsQuery extends StatelessWidget {
         ? Query(
             options: QueryOptions(
               document: gql(
-                  ticketsByShopIdAndUserId), // this is the query string you just created
-              variables: {
-                'shopId': 2, //userProvider.activeUser.shopId,
-                'userId': userProvider.activeUser!.id,
-              },
+                  ticketsOfUser), // this is the query string you just created
+
               pollInterval: const Duration(seconds: 10),
             ),
             // Just like in apollo refetch() could be used to manually trigger a refetch
@@ -35,9 +35,13 @@ class UserTicketsQuery extends StatelessWidget {
                 return const Text('Loading');
               }
 
-              List? tickets = result.data?['ticketsByShopIdAndUserId'];
+              List<Ticket>? tickets = [];
 
-              if (tickets == null) {
+              if (result.data?['ticketsOfUser'] != null &&
+                  result.data?['ticketsOfUser'].isNotEmpty) {
+                tickets = List<Ticket>.from(result.data!['ticketsOfUser']
+                    .map((ticketJson) => Ticket.fromJson(ticketJson)));
+              } else {
                 return const Text('No tickets');
               }
 
@@ -46,18 +50,37 @@ class UserTicketsQuery extends StatelessWidget {
                 child: ListView.builder(
                     itemCount: tickets.length,
                     itemBuilder: (context, index) {
-                      final ticket = tickets[index];
+                      final ticket = tickets![index];
 
                       return ListTile(
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: ((context) =>
-                                  SellingProcessTicket(ticket: ticket))),
+                                  TicketPage(ticket: ticket))),
                         ),
-                        title: Text(ticket['pos']?["name"] ?? ''),
-                        subtitle: Text(ticket["date"]),
-                        trailing: Text(ticket['status'].toString()),
+                        title: Text(
+                          ticket.pos!.name!,
+                          style: SUB_TITLE,
+                        ),
+                        subtitle: Text(
+                          readableTimeString(ticket.date!),
+                          style: SUB_TITLE,
+                        ),
+                        trailing: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
+                            color: statusToColor(ticket.status!),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              statusToString(ticket.status!),
+                              style: SMALL_TEXT,
+                            ),
+                          ),
+                        ),
                       );
                     }),
               );

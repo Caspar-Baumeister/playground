@@ -5,7 +5,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import * as React from "react";
-import POS_BY_SHOP_ID from "../graphql/queries/pos";
+import POS_OF_SHOP from "../graphql/queries/pos";
 import { ShopContext } from "../utiles/ShopContext";
 
 interface handlePosChangeProps {
@@ -22,15 +22,11 @@ export default function SecectPos({
   handlePosChange,
   initialPos,
 }: handlePosChangeProps) {
-  const shopState = React.useContext(ShopContext);
-
-  const { loading, error, data } = useQuery(POS_BY_SHOP_ID, {
-    variables: { shopId: shopState?.shop?.id },
-  });
+  const { loading, error, data } = useQuery(POS_OF_SHOP, {});
 
   React.useEffect(() => {
     if (!error && !loading) {
-      setAllPos(data.posByShopId);
+      setAllPos(data.posOfShop);
     }
   }, [data, error, loading]);
 

@@ -16,20 +16,30 @@ exports.PosResolver = void 0;
 const PointOfSell_1 = require("../entities/PointOfSell");
 const type_graphql_1 = require("type-graphql");
 const __1 = require("..");
+const isAuth_1 = require("../middleware/isAuth");
 let PosResolver = class PosResolver {
     allPointOfSell() {
         return PointOfSell_1.PointOfSell.find();
     }
-    posByShopId(shopId) {
+    posOfShop({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
         return __1.dataSource
             .getRepository(PointOfSell_1.PointOfSell)
             .createQueryBuilder("pos")
-            .where("pos.shopId = :id", { id: shopId })
+            .where("pos.shopId = :id", { id: Number.parseFloat(payload.shopId) })
             .orderBy("pos.updatedAt", "DESC")
             .getMany();
     }
-    async createPointOfSell(shopId, name) {
-        return PointOfSell_1.PointOfSell.create({ name, shopId }).save();
+    async createPointOfSell({ payload }, name) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
+        return PointOfSell_1.PointOfSell.create({
+            name,
+            shopId: Number.parseFloat(payload.shopId),
+        }).save();
     }
     async deletePointOfSell(id) {
         try {
@@ -48,18 +58,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PosResolver.prototype, "allPointOfSell", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [PointOfSell_1.PointOfSell]),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.Query)(() => [PointOfSell_1.PointOfSell], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], PosResolver.prototype, "posByShopId", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
+], PosResolver.prototype, "posOfShop", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => PointOfSell_1.PointOfSell),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __param(1, (0, type_graphql_1.Arg)("name")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], PosResolver.prototype, "createPointOfSell", null);
 __decorate([

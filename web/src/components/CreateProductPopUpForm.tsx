@@ -13,17 +13,14 @@ import * as yup from "yup";
 import SecectTags from "./SelectTags";
 import { useMutation } from "@apollo/client";
 import { CREATE_PRODUCT } from "../graphql/mutations/product";
-import { ShopContext } from "../utiles/ShopContext";
-import PRODUCTS_BY_SHOP_ID from "../graphql/queries/product";
+import PRODUCTS_OF_SHOP from "../graphql/queries/product";
 
 export default function CreateProductPopUpForm() {
-  const shopState = React.useContext(ShopContext);
   // create product mutation
   const [saveProduct, { error, data }] = useMutation(CREATE_PRODUCT, {
     refetchQueries: [
       {
-        query: PRODUCTS_BY_SHOP_ID,
-        variables: { shopId: shopState?.shop?.id },
+        query: PRODUCTS_OF_SHOP,
       },
     ],
   });
@@ -42,7 +39,6 @@ export default function CreateProductPopUpForm() {
 
   interface valuesTypes {
     name: string;
-    shopId: number | undefined;
     amountType: number | undefined;
     amount: number | undefined;
     price: number | undefined;
@@ -50,7 +46,6 @@ export default function CreateProductPopUpForm() {
 
   const initialValues: valuesTypes = {
     name: "",
-    shopId: shopState?.shop?.id,
     amountType: 0,
     amount: undefined,
     price: undefined,

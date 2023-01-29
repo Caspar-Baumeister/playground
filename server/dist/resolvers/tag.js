@@ -16,34 +16,46 @@ exports.TagResolver = void 0;
 const __1 = require("..");
 const type_graphql_1 = require("type-graphql");
 const Tag_1 = require("../entities/Tag");
+const isAuth_1 = require("../middleware/isAuth");
 let TagResolver = class TagResolver {
     tags() {
         return Tag_1.Tag.find();
     }
-    tagsByShopId(shopId) {
+    tagsByShopId({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
         return __1.dataSource
             .getRepository(Tag_1.Tag)
             .createQueryBuilder("tag")
-            .where("tag.shopId = :id", { id: shopId })
+            .where("tag.shopId = :id", {
+            id: Number.parseFloat(payload.shopId),
+        })
             .orderBy("tag.updatedAt", "DESC")
             .getMany();
     }
-    tagsByShopIdWithProducts(shopId) {
+    tagsByShopIdWithProducts({ payload }) {
+        var _a;
         return __1.dataSource
             .getRepository(Tag_1.Tag)
             .createQueryBuilder("tag")
-            .where("tag.shopId = :id", { id: shopId })
+            .where("tag.shopId = :id", {
+            id: Number.parseFloat((_a = payload === null || payload === void 0 ? void 0 : payload.shopId) !== null && _a !== void 0 ? _a : ""),
+        })
             .leftJoinAndSelect("tag.products", "product")
             .leftJoinAndSelect("product.tags", "tags")
             .orderBy("tag.updatedAt", "DESC")
             .orderBy("product.updatedAt", "DESC")
             .getMany();
     }
-    tagsByIdsWithProducts(shopId, ids) {
+    tagsByIdsWithProducts({ payload }, ids) {
+        var _a;
         return __1.dataSource
             .getRepository(Tag_1.Tag)
             .createQueryBuilder("tag")
-            .where("tag.shopId = :id", { id: shopId })
+            .where("tag.shopId = :id", {
+            id: Number.parseFloat((_a = payload === null || payload === void 0 ? void 0 : payload.shopId) !== null && _a !== void 0 ? _a : ""),
+        })
             .where("tag.id IN(:...ids)", { ids })
             .leftJoinAndSelect("tag.products", "product")
             .leftJoinAndSelect("product.tags", "tags")
@@ -51,8 +63,17 @@ let TagResolver = class TagResolver {
             .orderBy("product.updatedAt", "DESC")
             .getMany();
     }
-    async createTag(shopId, name, description) {
-        return Tag_1.Tag.create({ name, shopId, description }).save();
+    async createTag({ payload }, name, description) {
+        var _a;
+        console.log("payload", payload);
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
+        return Tag_1.Tag.create({
+            name,
+            shopId: Number.parseFloat((_a = payload === null || payload === void 0 ? void 0 : payload.shopId) !== null && _a !== void 0 ? _a : ""),
+            description,
+        }).save();
     }
     async updateTag(id, name) {
         const tag = await Tag_1.Tag.findOneBy({ id });
@@ -75,40 +96,44 @@ let TagResolver = class TagResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => [Tag_1.Tag]),
+    (0, type_graphql_1.Query)(() => [Tag_1.Tag], { nullable: true }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], TagResolver.prototype, "tags", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [Tag_1.Tag]),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.Query)(() => [Tag_1.Tag], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
 ], TagResolver.prototype, "tagsByShopId", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [Tag_1.Tag]),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.Query)(() => [Tag_1.Tag], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], TagResolver.prototype, "tagsByShopIdWithProducts", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [Tag_1.Tag]),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.Query)(() => [Tag_1.Tag], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __param(1, (0, type_graphql_1.Arg)("ids", () => [type_graphql_1.ID])),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Array]),
+    __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", Promise)
 ], TagResolver.prototype, "tagsByIdsWithProducts", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => Tag_1.Tag),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.Mutation)(() => Tag_1.Tag, { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __param(1, (0, type_graphql_1.Arg)("name")),
     __param(2, (0, type_graphql_1.Arg)("description", { nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, String]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", Promise)
 ], TagResolver.prototype, "createTag", null);
 __decorate([

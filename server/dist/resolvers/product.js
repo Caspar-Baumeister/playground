@@ -18,15 +18,19 @@ const type_graphql_1 = require("type-graphql");
 const __1 = require("..");
 const Tag_1 = require("../entities/Tag");
 const typeorm_1 = require("typeorm");
+const isAuth_1 = require("../middleware/isAuth");
 let ProductResolver = class ProductResolver {
     products() {
         return Product_1.Product.find();
     }
-    productsByShopId(shopId) {
+    productsOfShop({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
         return __1.dataSource
             .getRepository(Product_1.Product)
             .createQueryBuilder("product")
-            .where("product.shopId = :id", { id: shopId })
+            .where("product.shopId = :id", { id: Number.parseFloat(payload.shopId) })
             .leftJoinAndSelect("product.tags", "tags")
             .orderBy('product."updatedAt"', "DESC")
             .getMany();
@@ -39,10 +43,14 @@ let ProductResolver = class ProductResolver {
             .leftJoinAndSelect("product.tags", "tags")
             .getOne();
     }
-    async createProduct(name, price, amount, amountType, shopId, tags) {
+    async createProduct(name, price, amount, amountType, tags, { payload }) {
+        console.log("payload", payload);
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
         const product = Product_1.Product.create({
             name,
-            shopId,
+            shopId: Number.parseFloat(payload.shopId),
             price,
             amount,
             amountType,
@@ -89,12 +97,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "products", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [Product_1.Product]),
-    __param(0, (0, type_graphql_1.Arg)("shopId")),
+    (0, type_graphql_1.Query)(() => [Product_1.Product], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], ProductResolver.prototype, "productsByShopId", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
+], ProductResolver.prototype, "productsOfShop", null);
 __decorate([
     (0, type_graphql_1.Query)(() => Product_1.Product, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("id")),
@@ -103,15 +112,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "product", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => Product_1.Product),
+    (0, type_graphql_1.Mutation)(() => Product_1.Product, { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
     __param(0, (0, type_graphql_1.Arg)("name")),
     __param(1, (0, type_graphql_1.Arg)("price", () => type_graphql_1.Float)),
     __param(2, (0, type_graphql_1.Arg)("amount", () => type_graphql_1.Float)),
     __param(3, (0, type_graphql_1.Arg)("amountType")),
-    __param(4, (0, type_graphql_1.Arg)("shopId")),
-    __param(5, (0, type_graphql_1.Arg)("tags", () => [type_graphql_1.ID], { nullable: true })),
+    __param(4, (0, type_graphql_1.Arg)("tags", () => [type_graphql_1.ID], { nullable: true })),
+    __param(5, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number, Number, Number, Number, Array]),
+    __metadata("design:paramtypes", [String, Number, Number, Number, Array, Object]),
     __metadata("design:returntype", Promise)
 ], ProductResolver.prototype, "createProduct", null);
 __decorate([

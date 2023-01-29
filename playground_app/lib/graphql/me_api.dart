@@ -12,8 +12,7 @@ Future meApi(String token) async {
           'authorization': 'bearer $token'
         },
         body: json.encode({'query': meQuery}));
-    print("inside meApi");
-    print(response.body.toString());
+
     return jsonDecode(response.body.toString());
   } catch (e) {
     print(e.toString());

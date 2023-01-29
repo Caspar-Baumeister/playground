@@ -16,6 +16,7 @@ import { useFormik } from "formik";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { REGISTER } from "../graphql/mutations/user";
 import { toErrorMap } from "../utiles/toErrorMap";
 
 const validationSchema = yup.object({
@@ -29,24 +30,6 @@ const validationSchema = yup.object({
     .required("Password is required"),
   name: yup.string().required("Name is required"),
 });
-
-const REGISTER = gql`
-  mutation register($name: String!, $email: String!, $password: String!) {
-    register(name: $name, email: $email, password: $password) {
-      user {
-        id
-        name
-        email
-        createdAt
-        updatedAt
-      }
-      errors {
-        field
-        message
-      }
-    }
-  }
-`;
 
 export default function Register() {
   const [responseError, setResponseError] = useState({

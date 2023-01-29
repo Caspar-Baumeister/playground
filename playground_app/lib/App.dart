@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:playground_app/pages/login.dart';
+import 'package:playground_app/pages/authentication/login_wrapper.dart';
 import 'package:playground_app/provider/user_provider.dart';
+import 'package:playground_app/utiles/theme.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
@@ -17,9 +18,10 @@ class App extends StatelessWidget {
       ],
       child: GraphQLProvider(
         client: client,
-        child: const MaterialApp(
+        child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: LoginPage(),
+          theme: MyThemes.getThemeFromKey(MyThemeKeys.LIGHT),
+          home: const LogginWrapper(),
         ),
       ),
     );

@@ -16,32 +16,44 @@ exports.TicketResolver = void 0;
 const Ticket_1 = require("../entities/Ticket");
 const type_graphql_1 = require("type-graphql");
 const __1 = require("..");
+const isAuth_1 = require("../middleware/isAuth");
 let TicketResolver = class TicketResolver {
     tickets() {
         return Ticket_1.Ticket.find();
     }
-    ticketsByShopId(shopId) {
+    ticketsOfShop({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
         return __1.dataSource
             .getRepository(Ticket_1.Ticket)
             .createQueryBuilder("ticket")
-            .where("ticket.shopId = :id", { id: shopId })
+            .where("ticket.shopId = :id", { id: Number.parseFloat(payload.shopId) })
             .leftJoinAndSelect("ticket.pos", "pos")
             .leftJoinAndSelect("ticket.responsibleUser", "responsibleUser")
             .orderBy('ticket."updatedAt"', "DESC")
             .getMany();
     }
-    ticketsByShopIdAndUserId(shopId, userId) {
+    ticketsOfUser({ payload }) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId) || !(payload === null || payload === void 0 ? void 0 : payload.userId)) {
+            return null;
+        }
         return __1.dataSource
             .getRepository(Ticket_1.Ticket)
             .createQueryBuilder("ticket")
-            .where("ticket.shopId = :id", { id: shopId })
-            .andWhere("ticket.responsibleUserId = :id", { id: userId })
+            .where("ticket.shopId = :id", { id: Number.parseFloat(payload.shopId) })
+            .where("ticket.responsibleUserId = :id", {
+            id: Number.parseFloat(payload.userId),
+        })
             .leftJoinAndSelect("ticket.pos", "pos")
             .leftJoinAndSelect("ticket.responsibleUser", "responsibleUser")
             .orderBy('ticket."updatedAt"', "DESC")
             .getMany();
     }
-    async createTicket(responsibleUserId, posId, startMoney, endMoney, shopId, status, date, startComment, endComment) {
+    async createTicket({ payload }, responsibleUserId, posId, startMoney, endMoney, status, date, startComment, midComment, endComment) {
+        if (!(payload === null || payload === void 0 ? void 0 : payload.shopId)) {
+            return null;
+        }
         return Ticket_1.Ticket.create({
             responsibleUserId,
             date,
@@ -49,10 +61,44 @@ let TicketResolver = class TicketResolver {
             posId,
             startComment,
             startMoney,
-            shopId,
+            midComment,
+            shopId: Number.parseFloat(payload.shopId),
             status,
             endMoney,
         }).save();
+    }
+    async updateTicket(id, responsibleUserId, posId, startMoney, endMoney, status, startComment, midComment, endComment) {
+        const ticket = await Ticket_1.Ticket.findOneBy({
+            id,
+        });
+        if (!ticket) {
+            return null;
+        }
+        if (responsibleUserId != null) {
+            ticket.responsibleUserId = responsibleUserId;
+        }
+        if (posId != null) {
+            ticket.posId = posId;
+        }
+        if (midComment != null) {
+            ticket.midComment = midComment;
+        }
+        if (startMoney != null) {
+            ticket.startMoney = startMoney;
+        }
+        if (endMoney != null) {
+            ticket.endMoney = endMoney;
+        }
+        if (status != null) {
+            ticket.status = status;
+        }
+        if (startComment != null) {
+            ticket.startComment = startComment;
+        }
+        if (endComment != null) {
+            ticket.endComment = endComment;
+        }
+        return ticket.save();
     }
     ticket(id) {
         return (__1.dataSource
@@ -70,7 +116,7 @@ let TicketResolver = class TicketResolver {
         }
         return true;
     }
-    async deleteAll() {
+    async deleteAllTickets() {
         await __1.dataSource
             .getRepository(Ticket_1.Ticket)
             .createQueryBuilder("ticket")
@@ -87,35 +133,53 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TicketResolver.prototype, "tickets", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [Ticket_1.Ticket]),
-    __param(0, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
+    (0, type_graphql_1.Query)(() => [Ticket_1.Ticket], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], TicketResolver.prototype, "ticketsByShopId", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
+], TicketResolver.prototype, "ticketsOfShop", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [Ticket_1.Ticket]),
-    __param(0, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
-    __param(1, (0, type_graphql_1.Arg)("userId", () => type_graphql_1.ID)),
+    (0, type_graphql_1.Query)(() => [Ticket_1.Ticket], { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
-    __metadata("design:returntype", Promise)
-], TicketResolver.prototype, "ticketsByShopIdAndUserId", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
+], TicketResolver.prototype, "ticketsOfUser", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => Ticket_1.Ticket),
-    __param(0, (0, type_graphql_1.Arg)("responsibleUserId", () => type_graphql_1.ID)),
-    __param(1, (0, type_graphql_1.Arg)("posId", () => type_graphql_1.ID)),
-    __param(2, (0, type_graphql_1.Arg)("startMoney", () => type_graphql_1.Float)),
-    __param(3, (0, type_graphql_1.Arg)("endMoney", () => type_graphql_1.Float, { nullable: true })),
-    __param(4, (0, type_graphql_1.Arg)("shopId", () => type_graphql_1.ID)),
+    (0, type_graphql_1.Mutation)(() => Ticket_1.Ticket, { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuthJWT),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __param(1, (0, type_graphql_1.Arg)("responsibleUserId", () => type_graphql_1.ID)),
+    __param(2, (0, type_graphql_1.Arg)("posId", () => type_graphql_1.ID)),
+    __param(3, (0, type_graphql_1.Arg)("startMoney", () => type_graphql_1.Float)),
+    __param(4, (0, type_graphql_1.Arg)("endMoney", () => type_graphql_1.Float, { nullable: true })),
     __param(5, (0, type_graphql_1.Arg)("status")),
     __param(6, (0, type_graphql_1.Arg)("date", () => Date)),
     __param(7, (0, type_graphql_1.Arg)("startComment", { nullable: true })),
+    __param(8, (0, type_graphql_1.Arg)("midComment", { nullable: true })),
+    __param(9, (0, type_graphql_1.Arg)("endComment", { nullable: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number, Number, Number, Number, Number, String, String, String, String]),
+    __metadata("design:returntype", Promise)
+], TicketResolver.prototype, "createTicket", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Ticket_1.Ticket, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.ID)),
+    __param(1, (0, type_graphql_1.Arg)("responsibleUserId", () => type_graphql_1.ID, { nullable: true })),
+    __param(2, (0, type_graphql_1.Arg)("posId", () => type_graphql_1.ID, { nullable: true })),
+    __param(3, (0, type_graphql_1.Arg)("startMoney", () => type_graphql_1.Float, { nullable: true })),
+    __param(4, (0, type_graphql_1.Arg)("endMoney", () => type_graphql_1.Float, { nullable: true })),
+    __param(5, (0, type_graphql_1.Arg)("status", { nullable: true })),
+    __param(6, (0, type_graphql_1.Arg)("startComment", { nullable: true })),
+    __param(7, (0, type_graphql_1.Arg)("midComment", { nullable: true })),
     __param(8, (0, type_graphql_1.Arg)("endComment", { nullable: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, Number, Number, Number, Number, String, String, String]),
     __metadata("design:returntype", Promise)
-], TicketResolver.prototype, "createTicket", null);
+], TicketResolver.prototype, "updateTicket", null);
 __decorate([
     (0, type_graphql_1.Query)(() => Ticket_1.Ticket, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.ID)),
@@ -135,7 +199,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TicketResolver.prototype, "deleteAll", null);
+], TicketResolver.prototype, "deleteAllTickets", null);
 TicketResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], TicketResolver);

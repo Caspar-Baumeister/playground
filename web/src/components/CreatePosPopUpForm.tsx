@@ -11,16 +11,13 @@ import { useFormik } from "formik";
 import * as React from "react";
 import * as yup from "yup";
 import CREATE_POINT_OF_SELL from "../graphql/mutations/pos";
-import POS_BY_SHOP_ID from "../graphql/queries/pos";
-import { ShopContext } from "../utiles/ShopContext";
+import POS_OF_SHOP from "../graphql/queries/pos";
 
 export default function CreatePosPopUpForm() {
-  const shopState = React.useContext(ShopContext);
-
   // create tag mutation
   const [savePos, { error, data }] = useMutation(CREATE_POINT_OF_SELL, {
     refetchQueries: [
-      { query: POS_BY_SHOP_ID, variables: { shopId: shopState?.shop?.id } }, // DocumentNode object parsed with gql
+      { query: POS_OF_SHOP }, // DocumentNode object parsed with gql
     ],
   });
 
@@ -32,12 +29,10 @@ export default function CreatePosPopUpForm() {
 
   interface valuesTypes {
     name: string;
-    shopId: number | undefined;
   }
 
   const initialValues: valuesTypes = {
     name: "",
-    shopId: shopState?.shop?.id,
   };
 
   const formik = useFormik({

@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Float, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
@@ -41,8 +41,8 @@ export class TicketProduct extends BaseEntity {
   @JoinColumn({ name: "ticketId" })
   ticket: Ticket;
 
-  @Field()
-  @Column()
+  @Field(() => Float)
+  @Column({ type: "decimal" })
   startAmount!: number;
 
   @Field({ nullable: true })

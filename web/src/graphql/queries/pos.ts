@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 
-const POS_BY_SHOP_ID = gql`
-  query PosByShopId($shopId: Float!) {
-    posByShopId(shopId: $shopId) {
+const POS_OF_SHOP = gql`
+  query {
+    posOfShop {
       id
       name
     }
   }
 `;
 
-export default POS_BY_SHOP_ID;
+export default POS_OF_SHOP;

@@ -14,7 +14,6 @@ const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Ticket_1 = require("./Ticket");
 const Product_1 = require("./Product");
-const ShopUser_1 = require("./ShopUser");
 const Tag_1 = require("./Tag");
 const User_1 = require("./User");
 let Shop = class Shop extends typeorm_1.BaseEntity {
@@ -34,16 +33,6 @@ __decorate([
     __metadata("design:type", String)
 ], Shop.prototype, "name", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
-], Shop.prototype, "creatorId", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
-    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.createdShops, { onDelete: "SET NULL" }),
-    __metadata("design:type", User_1.User)
-], Shop.prototype, "creator", void 0);
-__decorate([
     (0, type_graphql_1.Field)(() => [Product_1.Product], { nullable: true }),
     (0, typeorm_1.OneToMany)(() => Product_1.Product, (product) => product.shop),
     __metadata("design:type", Array)
@@ -59,8 +48,8 @@ __decorate([
     __metadata("design:type", Array)
 ], Shop.prototype, "tickets", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [ShopUser_1.ShopUser], { nullable: true }),
-    (0, typeorm_1.OneToMany)(() => ShopUser_1.ShopUser, (shopUser) => shopUser.shop),
+    (0, type_graphql_1.Field)(() => [User_1.User], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => User_1.User, (user) => user.shop),
     __metadata("design:type", Array)
 ], Shop.prototype, "users", void 0);
 __decorate([

@@ -9,8 +9,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
 import { Checkbox, ListItemText } from "@mui/material";
 import { useQuery } from "@apollo/client";
-import TAGS_BY_SHOP_ID from "../graphql/queries/tagsByShopId";
-import { ShopContext } from "../utiles/ShopContext";
+import TAGS_OF_SHOP from "../graphql/queries/tag";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -25,7 +24,7 @@ const MenuProps = {
 
 interface handleTagChangeProps {
   handleTagChange: (tags: number[]) => any;
-  initialTags: number[] | undefined;
+  initialTags: number[] | undefined | null;
 }
 
 export type TagType = {
@@ -37,20 +36,16 @@ export default function SecectTags({
   handleTagChange,
   initialTags,
 }: handleTagChangeProps) {
-  const shopState = React.useContext(ShopContext);
-
-  // var allTags: TagType[] = data.tagsByShopId;
-
-  const { loading, error, data } = useQuery(TAGS_BY_SHOP_ID, {
-    variables: { shopId: shopState?.shop?.id },
-  });
+  const { loading, error, data } = useQuery(TAGS_OF_SHOP, {});
 
   React.useEffect(() => {
-    if (!error && !loading) {
+    console.log(data);
+    if (!error && !loading && data?.tagsByShopId) {
       setAllTags(data.tagsByShopId);
     }
   }, [data, error, loading]);
 
+  // brauche ich das?
   React.useEffect(() => {
     if (initialTags && initialTags.length > 0) {
       setTagId(initialTags);
@@ -69,6 +64,9 @@ export default function SecectTags({
 
   if (loading) return <div>loading...</div>;
   if (error) return <div>{error.message}</div>;
+  // if (!data?.tagsByShopId) {
+  //   return <Box></Box>;
+  // }
 
   return (
     <div>

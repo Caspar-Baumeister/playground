@@ -3,14 +3,12 @@ import { gql } from "@apollo/client";
 export const CREATE_PRODUCT = gql`
   mutation createProduct(
     $tags: [ID!]
-    $shopId: Float!
     $amountType: Float!
     $amount: Float!
     $price: Float!
     $name: String!
   ) {
     createProduct(
-      shopId: $shopId
       price: $price
       amountType: $amountType
       amount: $amount

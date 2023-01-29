@@ -1,16 +1,16 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Ticket } from "./Ticket";
 import { Shop } from "./Shop";
-import { ShopUser } from "./ShopUser";
 
 @ObjectType()
 @Entity()
@@ -30,13 +30,17 @@ export class User extends BaseEntity {
   @Column({})
   password!: string;
 
-  @Field(() => [Shop])
-  @OneToMany(() => Shop, (shop) => shop.creator)
-  createdShops: Shop[];
+  @Field()
+  @Column()
+  role!: number;
 
-  @Field(() => [ShopUser])
-  @OneToMany(() => ShopUser, (shopUser) => shopUser.user)
-  shopUsers: ShopUser[];
+  @Field(() => ID)
+  @Column()
+  shopId!: number;
+
+  @Field(() => Shop)
+  @ManyToOne(() => Shop, (shop) => shop.users)
+  shop: Shop;
 
   @Field(() => String)
   @CreateDateColumn({ type: "date" })

@@ -1,15 +1,7 @@
-import { useQuery } from "@apollo/client";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { FormControl } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -19,11 +11,8 @@ import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React from "react";
 import { mainListItems } from "../Components/Dashboard/listItems";
-import { MY_SHOPS } from "../graphql/queries/shop";
-import { ShopContext, ShopType } from "../utiles/ShopContext";
 
 const drawerWidth: number = 240;
 
@@ -82,131 +71,75 @@ const mdTheme = createTheme();
 
 export default function HomeLayout({ children }: Props) {
   const [open, setOpen] = React.useState(true);
-  const { loading, error, data } = useQuery(MY_SHOPS, {
-    variables: { limit: 10 },
-  });
-  const [shop, setShop] = useState<ShopType | null>(null);
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
-  if (loading) return <div>loading...</div>;
-  if (error) return <div>{error.message}</div>;
-
-  var myShops: ShopType[] = data.myShops;
-  if (!shop && myShops[0]) {
-    setShop(myShops[0]);
-  }
-
-  // const handleChangeShop = (
-  //   event: SelectChangeEvent<number>,
-  //   child: React.ReactNode
-  // ) => {
-  //   setShop(myShops.find((shop) => shop.id === event.target.value) ?? null);
-  // };
 
   return (
     <ThemeProvider theme={mdTheme}>
-      <ShopContext.Provider value={{ shop, setShop }}>
-        <Box sx={{ display: "flex" }}>
-          <CssBaseline />
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
 
-          <AppBar position="absolute" open={open}>
-            <Toolbar
-              sx={{
-                pr: "24px", // keep right padding when drawer closed
-              }}
-            >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                sx={{
-                  marginRight: "36px",
-                  ...(open && { display: "none" }),
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <FormControl sx={{ width: 300 }}>
-                {/* <Select
-                  labelId="demo-simple-select-label"
-                  renderValue={(value) =>
-                    value ? (
-                      <Typography
-                        component="h1"
-                        variant="h6"
-                        color="inherit"
-                        noWrap
-                        sx={{ flexGrow: 1 }}
-                      >
-                        {myShops.find((_shop) => _shop.id === value)?.name}
-                      </Typography>
-                    ) : (
-                      <Typography
-                        component="h1"
-                        variant="h6"
-                        color="inherit"
-                        noWrap
-                        sx={{ flexGrow: 1 }}
-                      >
-                        Select a shop
-                      </Typography>
-                    )
-                  }
-                  id="shop-select"
-                  value={shop?.id}
-                  onChange={handleChangeShop}
-                >
-                  {myShops.map((_shop) => (
-                    <MenuItem key={_shop.id} value={_shop?.id}>
-                      {_shop?.name}
-                    </MenuItem>
-                  ))}
-                </Select> */}
-              </FormControl>
-            </Toolbar>
-          </AppBar>
-          <Drawer variant="permanent" open={open}>
-            <Toolbar
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                px: [1],
-              }}
-            >
-              <IconButton onClick={toggleDrawer}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </Toolbar>
-            <Divider />
-            <List component="nav">
-              {mainListItems}
-              {/* <Divider sx={{ my: 1 }} />
-            {secondaryListItems} */}
-            </List>
-          </Drawer>
-          <Box
-            component="main"
+        <AppBar position="absolute" open={open}>
+          <Toolbar
             sx={{
-              backgroundColor: (theme) =>
-                theme.palette.mode === "light"
-                  ? theme.palette.grey[100]
-                  : theme.palette.grey[900],
-              flexGrow: 1,
-              height: "100vh",
-              overflow: "auto",
+              pr: "24px", // keep right padding when drawer closed
             }}
           >
-            <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-              {children}
-            </Container>
-          </Box>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: "36px",
+                ...(open && { display: "none" }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <FormControl sx={{ width: 300 }}></FormControl>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              px: [1],
+            }}
+          >
+            <IconButton onClick={toggleDrawer}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Toolbar>
+          <Divider />
+          <List component="nav">
+            {mainListItems}
+            {/* <Divider sx={{ my: 1 }} />
+            {secondaryListItems} */}
+          </List>
+        </Drawer>
+        <Box
+          component="main"
+          sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === "light"
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
+            flexGrow: 1,
+            height: "100vh",
+            overflow: "auto",
+          }}
+        >
+          <Toolbar />
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {children}
+          </Container>
         </Box>
-      </ShopContext.Provider>
+      </Box>
     </ThemeProvider>
   );
 }

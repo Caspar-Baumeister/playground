@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 const CREATE_POINT_OF_SELL = gql`
-  mutation CreatePointOfSell($name: String!, $shopId: Float!) {
-    createPointOfSell(name: $name, shopId: $shopId) {
+  mutation CreatePointOfSell($name: String!) {
+    createPointOfSell(name: $name) {
       id
       name
     }

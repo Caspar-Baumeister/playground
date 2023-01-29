@@ -13,17 +13,13 @@ export const MY_SHOPS = gql`
 `;
 
 export const SHOP_WITH_USERS = gql`
-  query ShopWithUsers($shopId: ID!) {
-    shopWithUsers(shopId: $shopId) {
+  query {
+    shopWithUsers {
       users {
-        user {
-          name
-          id
-        }
-      }
-      creator {
-        name
         id
+        email
+        name
+        role
       }
     }
   }

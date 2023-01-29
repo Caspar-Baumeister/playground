@@ -1,30 +1,24 @@
 import { ApolloServer } from "apollo-server-express";
-import connectRedis from "connect-redis";
 import cors from "cors";
 import express, { Express } from "express";
-import session from "express-session";
-import Redis from "ioredis";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { DataSource } from "typeorm";
-import { COOKIE_NAME, __prod__ } from "./constants";
-import { Ticket } from "./entities/Ticket";
 import { PointOfSell } from "./entities/PointOfSell";
 import { Product } from "./entities/Product";
 import { Shop } from "./entities/Shop";
-import { ShopUser } from "./entities/ShopUser";
 import { Tag } from "./entities/Tag";
+import { Ticket } from "./entities/Ticket";
+import { TicketProduct } from "./entities/TicketProduct";
 import { User } from "./entities/User";
+import { PosResolver } from "./resolvers/pos";
 import { ProductResolver } from "./resolvers/product";
 import { ShopResolver } from "./resolvers/shop";
 import { TagResolver } from "./resolvers/tag";
+import { TicketResolver } from "./resolvers/ticket";
+import { TicketProductResolver } from "./resolvers/ticketProduct";
 import { UserResolver } from "./resolvers/user";
 import { MyContext } from "./types";
-import { TicketProduct } from "./entities/TicketProduct";
-import { PosResolver } from "./resolvers/pos";
-import { TicketResolver } from "./resolvers/ticket";
-import { ShopUserResolver } from "./resolvers/shopUser";
-import { TicketProductResolver } from "./resolvers/ticketProduct";
 
 export const dataSource = new DataSource({
   type: "postgres",
@@ -33,16 +27,7 @@ export const dataSource = new DataSource({
   password: "C4sp4R123",
   logging: true,
   synchronize: true,
-  entities: [
-    Product,
-    User,
-    Shop,
-    Ticket,
-    PointOfSell,
-    Tag,
-    ShopUser,
-    TicketProduct,
-  ],
+  entities: [Product, User, Shop, Ticket, PointOfSell, Tag, TicketProduct],
 });
 
 const main = async () => {
@@ -58,8 +43,8 @@ const main = async () => {
   const app: Express = express();
 
   // Redis stores the cooky
-  const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  // const RedisStore = connectRedis(session);
+  // const redis = new Redis();
   // redis.connect().catch(console.error)
 
   // Connect Redis to the server and define in which Browser the server runs
@@ -69,20 +54,20 @@ const main = async () => {
       // origin: "http://localhost:3000",
       credentials: true,
       methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-    }),
-    session({
-      name: COOKIE_NAME,
-      store: new RedisStore({ client: redis as any, disableTouch: true }),
-      saveUninitialized: false,
-      secret: "iansdfinveqriungan",
-      resave: false,
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        httpOnly: true,
-        sameSite: "lax",
-        secure: __prod__, // cooky only works in https
-      },
     })
+    // session({
+    //   name: COOKIE_NAME,
+    //   store: new RedisStore({ client: redis as any, disableTouch: true }),
+    //   saveUninitialized: false,
+    //   secret: "iansdfinveqriungan",
+    //   resave: false,
+    //   cookie: {
+    //     maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+    //     httpOnly: true,
+    //     sameSite: "lax",
+    //     secure: __prod__, // cooky only works in https
+    //   },
+    // })
   );
 
   // Init Appolo with the Type-Graphql schemas and the Context
@@ -96,12 +81,11 @@ const main = async () => {
         TagResolver,
         PosResolver,
         TicketResolver,
-        ShopUserResolver,
         TicketProductResolver,
       ],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res }),
   });
 
   // Connect the appolo server to the Espress app

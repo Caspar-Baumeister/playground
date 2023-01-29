@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:playground_app/models/product_model.dart';
 import 'package:playground_app/utiles/text_styles.dart';
 
 class SingleProductBody extends StatelessWidget {
-  const SingleProductBody({super.key, this.product});
+  const SingleProductBody({super.key, required this.product});
 
-  final dynamic product;
+  final Product product;
 
   @override
   Widget build(BuildContext context) {
@@ -13,11 +14,11 @@ class SingleProductBody extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          product?["description"] != null
+          product.description != null
               ? Container(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    product["description"].toString(),
+                    product.description.toString(),
                     style: STANDART_TEXT,
                   ),
                 )

@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
+import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import { alpha, Button, Grid } from "@mui/material";
@@ -7,7 +8,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
-import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import Table from "@mui/material/Table";
@@ -22,11 +22,10 @@ import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { DELETE_PRODUCT } from "../graphql/mutations/product";
-import { TICKETS_BY_SHOP_ID } from "../graphql/queries/ticket";
+import { TICKETS_OF_SHOP } from "../graphql/queries/ticket";
 import { ShopContext } from "../utiles/ShopContext";
+import statusString from "../utiles/statusString";
 import CreatePosPopUpForm from "./CreatePosPopUpForm";
-import CreateProductPopUpForm from "./CreateProductPopUpForm";
-import CreateTagPopUpForm from "./CreateTagPopUpForm";
 import { TicketDetailsPopUp } from "./TicketDetailsPopUp";
 
 export interface PosData {
@@ -86,8 +85,7 @@ const columns: readonly Column[] = [
     id: "status",
     label: "Status",
     minWidth: 15,
-    align: "right",
-    format: (value: number) => value.toLocaleString("de-DE"),
+    format: (value: number) => statusString(value) ?? "",
   },
 
   {
@@ -198,15 +196,11 @@ function EnhancedTableToolbar() {
 }
 
 export default function TicketsTable() {
-  const shopState = React.useContext(ShopContext);
-
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const { loading, error, data } = useQuery(TICKETS_BY_SHOP_ID, {
-    variables: { shopId: shopState?.shop?.id },
-  });
+  const { loading, error, data } = useQuery(TICKETS_OF_SHOP, {});
 
   const [
     deleteProduct,
@@ -214,8 +208,7 @@ export default function TicketsTable() {
   ] = useMutation(DELETE_PRODUCT, {
     refetchQueries: [
       {
-        query: TICKETS_BY_SHOP_ID,
-        variables: { shopId: shopState?.shop?.id },
+        query: TICKETS_OF_SHOP,
       },
     ],
   });
@@ -238,7 +231,7 @@ export default function TicketsTable() {
     setDense(event.target.checked);
   };
 
-  const rawData: TicketData[] = data.ticketsByShopId;
+  const rawData: TicketData[] = data.ticketsOfShop;
   console.log("data:", data);
   console.log("rawData:", rawData);
 

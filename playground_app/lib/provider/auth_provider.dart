@@ -19,10 +19,18 @@ class AuthProvider {
   }
 
   static Future<String?> fetchToken() async {
+    // if the token is expired, there is no token or there are no valid credentials, return null
+    // otherwise if neccessary, fetch a new token and/or return the valid token
     if (isTokenExpired()) {
       String? email = CredentialPreferences.getEmail();
       String? password = CredentialPreferences.getPassword();
-      dynamic response = await loginApi(email ?? "", password ?? "");
+      print("credentials inside fetchToken");
+      print(email);
+      print(password);
+      if (email == null || password == null) {
+        return null;
+      }
+      dynamic response = await loginApi(email, password);
 
       if (response?["data"]?["login"]?["accessToken"] != null) {
         token = response["data"]["login"]["accessToken"];

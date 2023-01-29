@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const TICKETS_BY_SHOP_ID = gql`
-  query TicketsByShopId($shopId: ID!) {
-    ticketsByShopId(shopId: $shopId) {
+export const TICKETS_OF_SHOP = gql`
+  query {
+    ticketsOfShop {
       id
       date
       responsibleUser {

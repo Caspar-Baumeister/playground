@@ -1,6 +1,6 @@
-String productsByShopId = """
-   query ProductsByShopId(\$shopId: Float!) {
-    productsByShopId(shopId: \$shopId) {
+String productsOfShop = """
+   query {
+    productsOfShop {
       name
       id
       shopId

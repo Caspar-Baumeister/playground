@@ -4,24 +4,23 @@ import React, { useState } from "react";
 import CreateTicketForm from "../Components/CreateTicketForm";
 import CreateTicketsTable from "../Components/CreateTicketsTable";
 import { ProductData } from "../Components/TableProducts";
-import PRODUCTS_BY_SHOP_ID from "../graphql/queries/product";
+import PRODUCTS_OF_SHOP from "../graphql/queries/product";
 import { ShopContext } from "../utiles/ShopContext";
 import AddIcon from "@mui/icons-material/Add";
 import { PosData } from "../Components/TableTickets";
 import { useNavigate } from "react-router-dom";
-import { UserType } from "../Components/SelectUser";
 import {
   CREATE_TICKET,
   CREATE_TICKET_PRODUCTS,
 } from "../graphql/mutations/ticket";
-import { TICKETS_BY_SHOP_ID } from "../graphql/queries/ticket";
+import { TICKETS_OF_SHOP } from "../graphql/queries/ticket";
+import { UserType } from "../Components/SelectResponsibleUser";
 
 export type CreateTicketData = {
   id: undefined | null | number;
   pos: PosData | null;
   user: UserType | null;
   status: number;
-  shopId: number | undefined;
   date: Date;
   startMoney: number | null;
   startAmounts: ticketProductData[];
@@ -35,21 +34,13 @@ type ticketProductData = {
 
 export default function CreateTickets() {
   const navigate = useNavigate();
-  const shopState = React.useContext(ShopContext);
   const [errorMessage, setErrorMessage] = React.useState<String>("");
   const [confirmError, setConfirmError] = React.useState<Boolean>(false);
   const [loading, setLoading] = useState(false);
 
   // use mutatios: create ticket, create ticket products
   const [createTicket, { error: createTicketError, data: createTicketData }] =
-    useMutation(CREATE_TICKET, {
-      // refetchQueries: [
-      //   {
-      //     query: TICKETS_BY_SHOP_ID,
-      //     variables: { shopId: shopState?.shop?.id },
-      //   },
-      // ],
-    });
+    useMutation(CREATE_TICKET, {});
   // use mutatios:  create ticket products
   const [
     createTicketProducts,
@@ -57,8 +48,7 @@ export default function CreateTickets() {
   ] = useMutation(CREATE_TICKET_PRODUCTS, {
     refetchQueries: [
       {
-        query: TICKETS_BY_SHOP_ID,
-        variables: { shopId: shopState?.shop?.id },
+        query: TICKETS_OF_SHOP,
       },
     ],
   });
@@ -104,7 +94,6 @@ export default function CreateTickets() {
           date: ticket.date,
           posId: ticket.pos!.id,
           status: ticket.status,
-          shopId: ticket.shopId,
           responsibleUserId: ticket.user!.id,
           startMoney: ticket.startMoney,
         },
@@ -160,7 +149,6 @@ export default function CreateTickets() {
       pos: null,
       user: null,
       status: 0,
-      shopId: shopState?.shop?.id,
       date: new Date(),
       startMoney: 0,
       startAmounts: [],
@@ -179,7 +167,6 @@ export default function CreateTickets() {
           pos: null,
           user: null,
           status: 0,
-          shopId: shopState?.shop?.id,
           date: tickets[0].date,
           startMoney: 0,
           startAmounts: allProd.map((product) => {
@@ -241,17 +228,12 @@ export default function CreateTickets() {
     );
   }
 
-  const {
-    loading: loadingQuery,
-    error,
-    data,
-  } = useQuery(PRODUCTS_BY_SHOP_ID, {
-    variables: { shopId: shopState?.shop?.id },
-  });
+  const { loading: loadingQuery, error, data } = useQuery(PRODUCTS_OF_SHOP);
 
   React.useEffect(() => {
-    if (!error && !loading && data.productsByShopId) {
-      const allProd: ProductData[] = data.productsByShopId;
+    if (!error && !loadingQuery && data?.productsOfShop) {
+      console.log("problems here", data.productsOfShop);
+      const allProd: ProductData[] = data.productsOfShop;
       setInitialTicketProducts(0, allProd);
     }
   }, [data, error, loading]);
@@ -259,7 +241,7 @@ export default function CreateTickets() {
   if (loading || loadingQuery) return <div>loading...</div>;
   if (error) return <div>{error.message}</div>;
 
-  const allProd: ProductData[] = data.productsByShopId;
+  const allProd: ProductData[] = data.productsOfShop;
 
   // list of all openTickets objects
 

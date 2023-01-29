@@ -5,7 +5,6 @@ export const CREATE_TICKET = gql`
     $startComment: String
     $date: DateTime!
     $status: Float!
-    $shopId: ID!
     $posId: ID!
     $responsibleUserId: ID!
     $startMoney: Float!
@@ -15,7 +14,6 @@ export const CREATE_TICKET = gql`
       date: $date
       posId: $posId
       status: $status
-      shopId: $shopId
       responsibleUserId: $responsibleUserId
       startMoney: $startMoney
     ) {

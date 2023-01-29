@@ -20,7 +20,7 @@ import TableRow from "@mui/material/TableRow";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
-import PRODUCTS_BY_SHOP_ID from "../graphql/queries/product";
+import PRODUCTS_OF_SHOP from "../graphql/queries/product";
 import { ShopContext } from "../utiles/ShopContext";
 import CreateProductPopUpForm from "./CreateProductPopUpForm";
 import CreateTagPopUpForm from "./CreateTagPopUpForm";
@@ -165,8 +165,6 @@ function EnhancedTableToolbar(props: SearchProductsAutoCompletePropsType) {
 }
 
 export default function EnhancedTable() {
-  const shopState = React.useContext(ShopContext);
-
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -174,9 +172,7 @@ export default function EnhancedTable() {
   const [showId, setShowId] = React.useState(0);
   const [products, setProducts] = React.useState<ProductData[] | null>(null);
 
-  const { loading, error, data } = useQuery(PRODUCTS_BY_SHOP_ID, {
-    variables: { shopId: shopState?.shop?.id },
-  });
+  const { loading, error, data } = useQuery(PRODUCTS_OF_SHOP, {});
 
   const [
     deleteProduct,
@@ -184,15 +180,14 @@ export default function EnhancedTable() {
   ] = useMutation(DELETE_PRODUCT, {
     refetchQueries: [
       {
-        query: PRODUCTS_BY_SHOP_ID,
-        variables: { shopId: shopState?.shop?.id },
+        query: PRODUCTS_OF_SHOP,
       },
     ],
   });
 
   React.useEffect(() => {
     if (!error && !loading) {
-      setProducts(data.productsByShopId);
+      setProducts(data.productsOfShop);
     }
   }, [data]);
 
@@ -213,8 +208,11 @@ export default function EnhancedTable() {
   const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDense(event.target.checked);
   };
+  let rawData: ProductData[] = [];
 
-  const rawData: ProductData[] = data.productsByShopId;
+  if (data.productsOfShop) {
+    rawData = data.productsOfShop;
+  }
 
   const rows: DisplayData[] = rawData.map((_data) => ({
     id: _data.id,

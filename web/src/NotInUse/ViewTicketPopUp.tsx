@@ -15,7 +15,7 @@ import SecectTags from "../Components/SelectTags";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { UPDATE_PRODUCT } from "../graphql/mutations/product";
 import { ShopContext } from "../utiles/ShopContext";
-import PRODUCTS_BY_SHOP_ID, { PRODUCT } from "../graphql/queries/product";
+import PRODUCTS_OF_SHOP, { PRODUCT } from "../graphql/queries/product";
 import { TagsData } from "../Components/TableProducts";
 
 type propsType = {
@@ -23,8 +23,6 @@ type propsType = {
 };
 
 export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
-  const shopState = React.useContext(ShopContext);
-
   const [
     getProduct,
     { loading: loadingProduct, error: errorProduct, data: dataProduct },
@@ -39,8 +37,7 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
   ] = useMutation(UPDATE_PRODUCT, {
     refetchQueries: [
       {
-        query: PRODUCTS_BY_SHOP_ID,
-        variables: { shopId: shopState?.shop?.id },
+        query: PRODUCTS_OF_SHOP,
       },
     ],
   });
@@ -59,7 +56,6 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
 
   interface valuesTypes {
     name: string;
-    shopId: number | undefined;
     amountType: number | undefined;
     amount: number | undefined;
     price: number | undefined;
@@ -68,7 +64,6 @@ export const UpdateProductPopUpForm: React.FC<propsType> = (props) => {
 
   const initialValues: valuesTypes = {
     name: "",
-    shopId: shopState?.shop?.id,
     amountType: 0,
     amount: undefined,
     price: undefined,

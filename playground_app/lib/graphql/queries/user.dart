@@ -4,6 +4,9 @@ query {
     id
     name
     email
+    shop{
+      name
+    }
   }
 }
 """;

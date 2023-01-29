@@ -17,3 +17,6 @@ const TextStyle STANDART_DESCRIPTION =
 
 const TextStyle STANDART_BUTTON_TEXT =
     TextStyle(fontSize: 18, fontWeight: FontWeight.w600);
+
+const TextStyle SMALL_TEXT =
+    TextStyle(fontSize: 14, fontWeight: FontWeight.w300);

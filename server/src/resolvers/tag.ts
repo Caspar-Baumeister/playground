@@ -1,30 +1,49 @@
 import { dataSource } from "..";
-import { Arg, ID, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  ID,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { Tag } from "../entities/Tag";
+import { MyContext } from "../types";
+import { isAuthJWT } from "../middleware/isAuth";
 
 @Resolver()
 export class TagResolver {
-  @Query(() => [Tag])
+  @Query(() => [Tag], { nullable: true })
   tags(): Promise<Tag[]> {
     return Tag.find();
   }
 
-  @Query(() => [Tag])
-  tagsByShopId(@Arg("shopId") shopId: number): Promise<Tag[]> {
+  @Query(() => [Tag], { nullable: true })
+  @UseMiddleware(isAuthJWT)
+  tagsByShopId(@Ctx() { payload }: MyContext): Promise<Tag[]> | null {
+    if (!payload?.shopId) {
+      return null;
+    }
     return dataSource
       .getRepository(Tag)
       .createQueryBuilder("tag")
-      .where("tag.shopId = :id", { id: shopId })
+      .where("tag.shopId = :id", {
+        id: Number.parseFloat(payload.shopId),
+      })
       .orderBy("tag.updatedAt", "DESC")
       .getMany();
   }
 
-  @Query(() => [Tag])
-  tagsByShopIdWithProducts(@Arg("shopId") shopId: number): Promise<Tag[]> {
+  @Query(() => [Tag], { nullable: true })
+  @UseMiddleware(isAuthJWT)
+  tagsByShopIdWithProducts(@Ctx() { payload }: MyContext): Promise<Tag[]> {
     return dataSource
       .getRepository(Tag)
       .createQueryBuilder("tag")
-      .where("tag.shopId = :id", { id: shopId })
+      .where("tag.shopId = :id", {
+        id: Number.parseFloat(payload?.shopId ?? ""),
+      })
       .leftJoinAndSelect("tag.products", "product")
       .leftJoinAndSelect("product.tags", "tags")
       .orderBy("tag.updatedAt", "DESC")
@@ -32,15 +51,18 @@ export class TagResolver {
       .getMany();
   }
 
-  @Query(() => [Tag])
+  @Query(() => [Tag], { nullable: true })
+  @UseMiddleware(isAuthJWT)
   tagsByIdsWithProducts(
-    @Arg("shopId") shopId: number,
+    @Ctx() { payload }: MyContext,
     @Arg("ids", () => [ID]) ids: number[]
   ): Promise<Tag[]> {
     return dataSource
       .getRepository(Tag)
       .createQueryBuilder("tag")
-      .where("tag.shopId = :id", { id: shopId })
+      .where("tag.shopId = :id", {
+        id: Number.parseFloat(payload?.shopId ?? ""),
+      })
       .where("tag.id IN(:...ids)", { ids })
       .leftJoinAndSelect("tag.products", "product")
       .leftJoinAndSelect("product.tags", "tags")
@@ -49,13 +71,22 @@ export class TagResolver {
       .getMany();
   }
 
-  @Mutation(() => Tag)
+  @Mutation(() => Tag, { nullable: true })
+  @UseMiddleware(isAuthJWT)
   async createTag(
-    @Arg("shopId") shopId: number,
+    @Ctx() { payload }: MyContext,
     @Arg("name") name: string,
     @Arg("description", { nullable: true }) description: string
-  ): Promise<Tag> {
-    return Tag.create({ name, shopId, description }).save();
+  ): Promise<Tag | null> {
+    console.log("payload", payload);
+    if (!payload?.shopId) {
+      return null;
+    }
+    return Tag.create({
+      name,
+      shopId: Number.parseFloat(payload?.shopId ?? ""),
+      description,
+    }).save();
   }
 
   @Mutation(() => Tag, { nullable: true })

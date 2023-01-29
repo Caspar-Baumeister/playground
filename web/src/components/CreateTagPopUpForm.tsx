@@ -11,16 +11,13 @@ import { useFormik } from "formik";
 import * as React from "react";
 import * as yup from "yup";
 import CREATE_TAG from "../graphql/mutations/tag";
-import TAGS_BY_SHOP_ID from "../graphql/queries/tagsByShopId";
-import { ShopContext } from "../utiles/ShopContext";
+import TAGS_OF_SHOP from "../graphql/queries/tag";
 
 export default function CreateTagPopUpForm() {
-  const shopState = React.useContext(ShopContext);
-
   // create tag mutation
   const [saveTag, { error, data }] = useMutation(CREATE_TAG, {
     refetchQueries: [
-      { query: TAGS_BY_SHOP_ID, variables: { shopId: shopState?.shop?.id } }, // DocumentNode object parsed with gql
+      { query: TAGS_OF_SHOP }, // DocumentNode object parsed with gql
     ],
   });
 
@@ -33,13 +30,11 @@ export default function CreateTagPopUpForm() {
   interface valuesTypes {
     name: string;
     description: string | undefined;
-    shopId: number | undefined;
   }
 
   const initialValues: valuesTypes = {
     name: "",
     description: "",
-    shopId: shopState?.shop?.id,
   };
 
   const formik = useFormik({
@@ -52,9 +47,6 @@ export default function CreateTagPopUpForm() {
 
   return (
     <div>
-      {/* <Button variant="outlined" onClick={handleClickOpen} color="secondary">
-        Neues Produkt
-      </Button> */}
       <Button
         onClick={() => handleChange(true)}
         sx={{ borderRadius: 10 }}
@@ -63,9 +55,7 @@ export default function CreateTagPopUpForm() {
       >
         Tag
       </Button>
-      {/* <IconButton onClick={() => handleChange(true)} color="default">
-        <AddIcon />
-      </IconButton> */}
+
       <Dialog open={open} onClose={() => handleChange(false)}>
         <DialogTitle>Neuer Tag</DialogTitle>
 

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const PRODUCTS_BY_SHOP_ID = gql`
-  query ProductsByShopId($shopId: Float!) {
-    productsByShopId(shopId: $shopId) {
+export const PRODUCTS_OF_SHOP = gql`
+  query {
+    productsOfShop {
       name
       id
       shopId
@@ -36,4 +36,4 @@ export const PRODUCT = gql`
   }
 `;
 
-export default PRODUCTS_BY_SHOP_ID;
+export default PRODUCTS_OF_SHOP;

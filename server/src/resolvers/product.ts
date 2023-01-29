@@ -1,8 +1,19 @@
 import { Product } from "../entities/Product";
-import { Arg, Mutation, Query, Resolver, Float, ID } from "type-graphql";
+import {
+  Arg,
+  Mutation,
+  Query,
+  Resolver,
+  Float,
+  ID,
+  Ctx,
+  UseMiddleware,
+} from "type-graphql";
 import { dataSource } from "..";
 import { Tag } from "../entities/Tag";
 import { In } from "typeorm";
+import { MyContext } from "../types";
+import { isAuthJWT } from "../middleware/isAuth";
 
 @Resolver()
 export class ProductResolver {
@@ -11,12 +22,16 @@ export class ProductResolver {
     return Product.find();
   }
 
-  @Query(() => [Product])
-  productsByShopId(@Arg("shopId") shopId: number): Promise<Product[]> {
+  @Query(() => [Product], { nullable: true })
+  @UseMiddleware(isAuthJWT)
+  productsOfShop(@Ctx() { payload }: MyContext): Promise<Product[]> | null {
+    if (!payload?.shopId) {
+      return null;
+    }
     return dataSource
       .getRepository(Product)
       .createQueryBuilder("product")
-      .where("product.shopId = :id", { id: shopId })
+      .where("product.shopId = :id", { id: Number.parseFloat(payload!.shopId) })
       .leftJoinAndSelect("product.tags", "tags")
       .orderBy('product."updatedAt"', "DESC")
       .getMany();
@@ -32,18 +47,23 @@ export class ProductResolver {
       .getOne();
   }
 
-  @Mutation(() => Product)
+  @Mutation(() => Product, { nullable: true })
+  @UseMiddleware(isAuthJWT)
   async createProduct(
     @Arg("name") name: string,
     @Arg("price", () => Float) price: number,
     @Arg("amount", () => Float) amount: number,
     @Arg("amountType") amountType: number,
-    @Arg("shopId") shopId: number,
-    @Arg("tags", () => [ID], { nullable: true }) tags: number[]
-  ): Promise<Product> {
+    @Arg("tags", () => [ID], { nullable: true }) tags: number[],
+    @Ctx() { payload }: MyContext
+  ): Promise<Product | null> {
+    console.log("payload", payload);
+    if (!payload?.shopId) {
+      return null;
+    }
     const product = Product.create({
       name,
-      shopId,
+      shopId: Number.parseFloat(payload!.shopId),
       price,
       amount,
       amountType,

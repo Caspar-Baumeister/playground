@@ -47,8 +47,8 @@ __decorate([
     __metadata("design:type", Ticket_1.Ticket)
 ], TicketProduct.prototype, "ticket", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
+    (0, type_graphql_1.Field)(() => type_graphql_1.Float),
+    (0, typeorm_1.Column)({ type: "decimal" }),
     __metadata("design:type", Number)
 ], TicketProduct.prototype, "startAmount", void 0);
 __decorate([

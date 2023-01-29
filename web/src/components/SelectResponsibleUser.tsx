@@ -6,7 +6,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import * as React from "react";
 import { SHOP_WITH_USERS } from "../graphql/queries/shop";
-import { ShopContext } from "../utiles/ShopContext";
 
 interface handleUserChangeProps {
   handleUserChange: (user: UserType) => any;
@@ -23,31 +22,21 @@ export type ShopUsers = {
 export type UserType = {
   name: string;
   id: number;
+  role: number;
 };
 
 export default function SelectResponsibleUser({
   handleUserChange,
   initialUser,
 }: handleUserChangeProps) {
-  const shopState = React.useContext(ShopContext);
-
-  const { loading, error, data } = useQuery(SHOP_WITH_USERS, {
-    variables: { shopId: shopState?.shop?.id },
-  });
+  const { loading, error, data } = useQuery(SHOP_WITH_USERS, {});
 
   const [allUser, setAllUser] = React.useState<UserType[]>([]);
   const [userId, setUserId] = React.useState<number | undefined>(initialUser);
 
   React.useEffect(() => {
-    if (!error && !loading) {
-      var users: UserType[] = data.shopWithUsers.users.map(
-        (shopUser: ShopUsers) => {
-          return shopUser.user;
-        }
-      );
-      const creator: UserType = data.shopWithUsers.creator;
-      users.push(creator);
-      setAllUser(users);
+    if (!error && !loading && data.shopWithUsers?.users) {
+      setAllUser(data.shopWithUsers.users);
     }
   }, [data, error, loading]);
 
